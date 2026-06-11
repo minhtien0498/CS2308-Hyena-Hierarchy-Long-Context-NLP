@@ -17,7 +17,7 @@ Repo này tái hiện kiến trúc **Hyena Hierarchy** ở quy mô nhỏ, so sá
 ## 🗂️ Cấu Trúc Thư Mục
 
 ```
-hyena-reproduction/
+.
 ├── README.md
 ├── requirements.txt
 ├── data/
@@ -60,7 +60,7 @@ hyena-reproduction/
 
 ```bash
 git clone <your-repo-url>
-cd hyena-reproduction
+cd CS2308-Hyena-Hierarchy-Long-Context-NLP
 pip install -r requirements.txt
 ```
 

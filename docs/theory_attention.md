@@ -120,4 +120,4 @@ Attention(Q, K, V) = softmax(Q·Kᵀ / √d_k) · V
 
 ---
 
-*File này là output của Thành viên 1, Tuần 1. Cập nhật lần cuối: ___/2026*
+*File này là output của Thành viên 1, Tuần 1. Cập nhật lần cuối: 11/06/2026*
