@@ -1,4 +1,4 @@
-# Python
+# --- Python ---
 __pycache__/
 *.py[cod]
 *.egg-info/
@@ -6,45 +6,23 @@ __pycache__/
 dist/
 build/
 
-# Jupyter
-.ipynb_checkpoints/
-
-# Data & Models (lớn, không commit)
-.cache/
-# --- Python ---
-__pycache__/
-*.py[cod]
-*.egg-info/
+# --- Jupyter ---
 .ipynb_checkpoints/
 
 # --- Virtual envs ---
 .venv/
 venv/
 env/
+.env
 
 # --- ML artifacts (nặng, không commit) ---
-# Checkpoint model (.pt) — tái tạo được bằng train.py, đừng đẩy lên git
+# Checkpoint model — tái tạo được bằng train.py, đừng đẩy lên git
 results/checkpoints/
 *.pt
 *.pth
 *.ckpt
 
-# Results (commit CSV nhưng không commit model weights)
-results/checkpoints/
-
-# Environment
-.env
-venv/
-.venv/
-
-# OS
-.DS_Store
-Thumbs.db
-
-# IDE
-.vscode/
-.idea/
-# HuggingFace / dataset cache tải về lúc chạy
+# --- HuggingFace / dataset cache tải về lúc chạy ---
 .cache/
 data/cache/
 wikitext*/
@@ -54,11 +32,12 @@ wikitext*/
 # CSV (E1/E2/E3) và plot trong results/ VẪN được commit để đưa lên slide.
 # (không ignore results/*.csv và results/plots/*.png)
 
-# --- macOS / IDE rác ---
+# --- OS / IDE rác ---
 .DS_Store
+Thumbs.db
 *.swp
+.vscode/
+.idea/
 local/
 # file ide-selection do editor sinh ra
 *ideselection*.txt
-
-/local
