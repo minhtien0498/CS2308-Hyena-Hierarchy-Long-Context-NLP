@@ -1,4 +1,4 @@
-# Hyena Hierarchy — Small-Scale Reproduction
+# Hyena Hierarchy — Paper Presentation & Small-Scale Reproduction
 **Môn:** CS2308 – Chuyên đề Nghiên cứu và Ứng dụng về Xử lý Ngôn ngữ Tự nhiên  
 **Bài báo:** *Hyena Hierarchy: Towards Larger Convolutional Language Models* (Poli et al., ICML 2023)
 
@@ -6,7 +6,10 @@
 
 ## 📋 Tổng Quan
 
-Repo này tái hiện kiến trúc **Hyena Hierarchy** ở quy mô nhỏ, so sánh với Transformer baseline trên dataset WikiText-2.
+Repo này phục vụ hai mục tiêu chính:
+
+1. **Trình bày lại bài báo Hyena Hierarchy** trong buổi seminar 30 phút và chuẩn bị 15 phút hỏi đáp.
+2. **Tái hiện ở quy mô nhỏ** kiến trúc Hyena Hierarchy, so sánh với Transformer baseline trên dataset WikiText-2.
 
 **Mục tiêu:** Kiểm chứng xu hướng:
 - Perplexity tương đương giữa Transformer và Hyena ở scale nhỏ
@@ -30,26 +33,23 @@ Repo này tái hiện kiến trúc **Hyena Hierarchy** ở quy mô nhỏ, so sá
 ├── train.py                   # Training loop chính
 ├── evaluate.py                # Evaluation: val loss + perplexity + time
 ├── notebooks/
-│   ├── 01_data_exploration.ipynb    # Khám phá dataset
 │   ├── 02_model_training.ipynb      # Training walkthrough (Colab-ready)
-│   └── 03_results_analysis.ipynb   # Phân tích kết quả + plots
+│   └── reproduce.ipynb              # Notebook tái hiện nhanh
 ├── results/
-│   ├── E1_baseline.csv              # PPL Transformer vs Hyena, L=256
-│   ├── E2_transformer_scale.csv    # Time/Mem Transformer vs L
-│   ├── E3_hyena_scale.csv          # Time/Mem Hyena vs L
 │   └── plots/
-│       ├── loss_curves.png
-│       ├── scaling_time.png
-│       └── scaling_memory.png
+│       └── reproduce_runtime.png    # Biểu đồ runtime reproduction
 ├── docs/
-│   ├── paper_summary.md            # Tóm tắt bài báo Hyena (TV1 điền)
-│   ├── theory_attention.md         # Lý thuyết Transformer + Attention (TV1 điền)
-│   ├── comparison_table.md         # Bảng so sánh Transformer vs Hyena (TV1 điền)
-│   └── related_work_notes.md       # SSM, H3, Mamba (TV1 điền)
-├── report/
-│   └── report.pdf                  # Báo cáo PDF cuối cùng
+│   ├── paper_summary.md            # Tóm tắt bài báo Hyena
+│   ├── theory_attention.md         # Lý thuyết Transformer + Attention
+│   ├── comparison_table.md         # Bảng so sánh Transformer vs Hyena
+│   ├── related_work_notes.md       # SSM, H3, GSS, Mamba
+│   ├── ke_hoach_trien_khai_hyena.md
+│   ├── huong_dan_de_tai_hyena.md
+│   ├── phan_cong_present_hyena_3_tuan.md
+│   └── poli23a.pdf                 # Paper gốc
 └── slides/
-    └── presentation.pdf            # Slide thuyết trình
+    ├── slide_outline.md            # Outline slide
+    └── slides.md                   # Slide Marp
 ```
 
 ---
@@ -121,6 +121,32 @@ python evaluate.py --model hyena --checkpoint results/checkpoints/hyena_best.pt
 
 ---
 
+## 🎤 Chuẩn Bị Thuyết Trình
+
+Buổi seminar dự kiến gồm **30 phút trình bày** và **15 phút hỏi đáp**. Nhóm chia nội dung thành khoảng **24 slide**, mỗi thành viên phụ trách khoảng **8 slide**.
+
+| Thành viên | Slide | Nội dung chính |
+|---|---:|---|
+| TV1 | 1–8 | Nền tảng, motivation, Self-Attention, `O(L²)`, related work |
+| TV2 | 9–16 | Hyena operator, long convolution, gating, FFTConv, kết quả paper gốc |
+| TV3 | 17–24 | Small-scale reproduction, dataset, setup, kết quả nhóm, thảo luận |
+
+Tài liệu phân công chi tiết:
+
+- [`docs/phan_cong_present_hyena_3_tuan.md`](docs/phan_cong_present_hyena_3_tuan.md): phân công slide, output cần chuẩn bị, liên kết giữa các thành viên và Q&A.
+- [`slides/slide_outline.md`](slides/slide_outline.md): outline slide đề xuất.
+- [`slides/slides.md`](slides/slides.md): bản slide Marp hiện có.
+
+Phần hỏi đáp được chia theo phần trình bày:
+
+| Nhóm câu hỏi | Người trả lời chính |
+|---|---|
+| Transformer, Self-Attention, complexity, related work | TV1 |
+| Hyena operator, FFTConv, gating, kết quả paper gốc | TV2 |
+| Dataset, code, reproduction, kết quả nhóm, giới hạn | TV3 |
+
+---
+
 ## 📚 Tài Liệu Tham Khảo Chính
 
 1. Poli et al. (2023). *Hyena Hierarchy: Towards Larger Convolutional Language Models*. ICML 2023.
@@ -135,6 +161,6 @@ python evaluate.py --model hyena --checkpoint results/checkpoints/hyena_best.pt
 
 | Thành viên | Vai trò | Phụ trách |
 |---|---|---|
-| TV1 | Lý thuyết & Paper Survey | `docs/`, Sections 1-3 báo cáo |
-| TV2 | Dataset & Pipeline | `data/`, `README.md`, notebooks |
-| TV3 | Model & Training | `models/`, `train.py`, `evaluate.py`, `results/` |
+| TV1 | Nền tảng & Paper Survey | Motivation, Self-Attention, related work, slide 1–8 |
+| TV2 | Hyena Method & Paper Results | Hyena operator, FFTConv, kết quả paper gốc, slide 9–16 |
+| TV3 | Reproduction & Evaluation | Dataset, model setup, kết quả nhóm, slide 17–24 |
