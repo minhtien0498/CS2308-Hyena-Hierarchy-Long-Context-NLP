@@ -21,7 +21,7 @@ from transformers import GPT2Tokenizer
 
 
 # ─── Constants ────────────────────────────────────────────────
-DATASET_NAME = "wikitext"
+DATASET_NAME = "Salesforce/wikitext"  # tên đầy đủ namespace/name (datasets/hub bản mới bắt buộc)
 DATASET_CONFIG = "wikitext-2-raw-v1"
 TOKENIZER_NAME = "gpt2"
 CACHE_DIR = ".cache"
@@ -52,16 +52,13 @@ class SequenceDataset(Dataset):
 
 # ─── Core Functions ────────────────────────────────────────────
 def load_tokenizer(cache_dir: str = CACHE_DIR) -> GPT2Tokenizer:
-    """Load GPT-2 BPE tokenizer (tải về lần đầu, cache lại sau)."""
-    os.makedirs(cache_dir, exist_ok=True)
-    local_path = os.path.join(cache_dir, "gpt2_tokenizer")
-    if os.path.exists(local_path):
-        print(f"[Tokenizer] Loading from cache: {local_path}")
-        return GPT2Tokenizer.from_pretrained(local_path)
-    print(f"[Tokenizer] Downloading {TOKENIZER_NAME}...")
-    tokenizer = GPT2Tokenizer.from_pretrained(TOKENIZER_NAME)
-    tokenizer.save_pretrained(local_path)
-    return tokenizer
+    """Load GPT-2 BPE tokenizer.
+
+    Dùng cache mặc định của transformers (~/.cache/huggingface) — bền vững,
+    tránh lỗi thư mục cache tự chế bị thiếu file (vocab.json/merges.txt → None).
+    """
+    print(f"[Tokenizer] Loading {TOKENIZER_NAME} (transformers tự cache)...")
+    return GPT2Tokenizer.from_pretrained(TOKENIZER_NAME)
 
 
 def load_and_tokenize(split: str = "train",
