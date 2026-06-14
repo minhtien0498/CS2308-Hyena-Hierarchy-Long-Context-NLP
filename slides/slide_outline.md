@@ -1,278 +1,278 @@
-# Slide Outline — Đề Tài Hyena Hierarchy
-**Môn:** CS2308 – Chuyên đề NLP | **Thời gian:** 15–20 phút | **Số slide:** 12
+# Slide Outline — Hyena Hierarchy
 
-> Sử dụng file này để làm slide trên Google Slides, PowerPoint, hoặc Canva.
-> Mỗi slide có: Tiêu đề · Bullet chính · Hình/Bảng cần có · Speaker note
-
----
-
-## SLIDE 1 — Trang Bìa
-**Tiêu đề:** Khảo Sát và Tái Hiện Kiến Trúc Hyena Hierarchy
-
-**Nội dung:**
-- Tên đề tài đầy đủ (in lớn, 2 dòng)
-- *Hướng tiếp cận tích chập dưới bậc hai thay thế Attention cho mô hình ngôn ngữ ngữ cảnh dài*
-- Tên 3 thành viên nhóm
-- Môn: CS2308 – Chuyên đề Nghiên cứu và Ứng dụng về XLNNTNN
-- Ngày thuyết trình
-
-**Hình/Bảng:** Logo trường UIT; hình minh họa neural network hoặc sequence model
-
-**Speaker note:**
-> "Kính chào thầy/cô và các bạn. Hôm nay nhóm chúng em xin trình bày đề tài về kiến trúc Hyena Hierarchy — một hướng tiếp cận mới nhằm thay thế cơ chế Self-Attention trong Transformer cho các bài toán ngôn ngữ có ngữ cảnh dài. Nhóm gồm 3 thành viên: [tên TV1], [tên TV2], [tên TV3]."
+**Môn:** CS2308 - Chuyên đề NLP  
+**Bài báo:** *Hyena Hierarchy: Towards Larger Convolutional Language Models* - Poli et al., ICML 2023  
+**Thời lượng:** 45 phút trình bày + 15 phút hỏi đáp  
+**Số slide đề xuất:** 33 slide  
+**Phân chia:** 3 thành viên, mỗi người khoảng 11 slide / 15 phút
 
 ---
 
-## SLIDE 2 — Bối Cảnh và Vấn Đề (Motivation)
-**Tiêu đề:** Tại Sao Cần Nghiên Cứu Điều Này?
+## Tổng Quan Phân Chia
 
-**Nội dung (3–4 bullet):**
-- 🏆 **Transformer** thống trị NLP từ 2017 (BERT, GPT, LLaMA...)
-- ⚠️ **Hạn chế cốt lõi:** Self-Attention có độ phức tạp **O(L²)** theo độ dài chuỗi
-- 💥 **Thực tế:** Ở L = 64,000 tokens → PyTorch attention **hết RAM (OOM)**
-- ❓ **Câu hỏi nghiên cứu:** Có thể thiết kế toán tử **dưới bậc hai** đạt chất lượng tương đương?
-
-**Hình/Bảng:**
-- Biểu đồ so sánh complexity: O(L²) vs O(L log L) vs O(L)
-- Trục x: Sequence length (256 → 64K), Trục y: Time/Memory
-- Annotation: "Transformer OOM ở đây" ở L=8192+
-
-**Speaker note:**
-> "Kể từ khi Transformer ra đời năm 2017, hầu hết mọi mô hình ngôn ngữ lớn đều dựa trên cơ chế Self-Attention. Tuy nhiên, Attention có một điểm yếu cơ bản: chi phí tính toán và bộ nhớ tăng theo bậc hai khi sequence length tăng. Điều này đồng nghĩa với việc xử lý văn bản dài — ví dụ như một cuốn sách hay một đoạn code dài — trở nên cực kỳ tốn kém, thậm chí bất khả thi trên GPU thông thường."
+| Thành viên | Slide | Nội dung |
+|---|---:|---|
+| TV1 | 1-11 | Nền tảng, motivation, Self-Attention, related work |
+| TV2 | 12-22 | Hyena operator, FFTConv, implicit filter, kết quả paper gốc |
+| TV3 | 23-33 | Reproduction của nhóm, thực nghiệm, thảo luận, kết luận |
 
 ---
 
-## SLIDE 3 — Self-Attention Recap
-**Tiêu đề:** Self-Attention: Tại Sao O(L²)?
+## TV1 — Nền Tảng và Motivation
 
-**Nội dung:**
-- **Công thức:** `Attention(Q,K,V) = softmax(QKᵀ / √d) · V`
-- **Ma trận Attention:** kích thước L × L — mỗi token attend vào mọi token
-- **3 đặc tính của Attention:**
-  - ✅ Data-controlled (phụ thuộc vào input)
-  - ✅ Sublinear parameters (chỉ cần 3 ma trận W_Q, W_K, W_V)
-  - ⚠️ Unrestricted context → O(L²) không tránh khỏi
+### Slide 1 — Trang Bìa
 
-**Hình/Bảng:**
-- Sơ đồ ô vuông L×L minh họa attention matrix
-- Highlight: khi L tăng 2x → số ô tăng 4x
+- Tên đề tài: Khảo sát và tái hiện kiến trúc Hyena Hierarchy.
+- Tên bài báo, tác giả, venue ICML 2023.
+- Tên nhóm, môn học, ngày trình bày.
 
-**Speaker note:**
-> "Attention rất mạnh vì mỗi token có thể 'nhìn' vào mọi token khác trong sequence. Nhưng để làm điều đó, cần tính ma trận L×L — và khi L tăng gấp đôi, ma trận tăng gấp bốn. Đây chính là bất lợi quadratic mà Hyena muốn giải quyết."
+### Slide 2 — Câu Hỏi Nghiên Cứu
 
----
+- "Is attention all we need?"
+- Có thể thay Self-Attention bằng một toán tử dưới bậc hai mà vẫn đạt chất lượng tương đương không?
+- Dẫn vào mục tiêu của Hyena.
 
-## SLIDE 4 — Landscape: Các Hướng Thay Thế Attention
-**Tiêu đề:** Hyena Trong Bối Cảnh Nghiên Cứu
+### Slide 3 — Vì Sao Long-Context Quan Trọng?
 
-**Nội dung:**
-- **Timeline (2020→2023):**
-  `Linear Attn (2020) → Performer → S4 (2021) → H3 (2022) → Hyena (2023) → Mamba (2023)`
-- **Phân loại kiến trúc:**
+- Tài liệu dài, sách, code dài, hội thoại dài.
+- Chuỗi sinh học, âm thanh, video, ảnh lớn.
+- Long-context là yêu cầu thực tế nhưng Attention rất tốn kém.
 
-| Kiến trúc | Approach | Complexity | Chất lượng |
-|---|---|---|---|
-| Transformer | Dense Attention | O(L²) | 🟢 Cao |
-| S4 / SSM | State Space | O(L log L) | 🟡 Thấp hơn |
-| H3 | SSM + Gating | O(L log L) | 🟡 Gần hơn |
-| **Hyena** | Conv + Gating | **O(N·L log L)** | **🟢 Match Transformer** |
-| Mamba | Selective SSM | O(L) | 🟢 Cao |
+### Slide 4 — Language Modeling Recap
 
-**Speaker note:**
-> "Nhiều nhóm nghiên cứu đã cố gắng vượt qua hạn chế này. Hyena là một bước đột phá quan trọng năm 2023: lần đầu tiên một kiến trúc attention-free match được Transformer trên benchmark lớn mà không cần hybrid. Và Hyena cũng là tiền thân trực tiếp của Mamba — kiến trúc đang rất được quan tâm hiện nay."
+- Autoregressive language modeling.
+- Next-token prediction.
+- Perplexity: PPL thấp hơn nghĩa là mô hình dự đoán tốt hơn.
 
----
+### Slide 5 — Transformer Recap
 
-## SLIDE 5 — Hyena Hierarchy: Ý Tưởng Chính ⭐
-**Tiêu đề:** Hyena = Long Convolution + Gating
+- Token embedding + positional embedding.
+- Transformer block: Self-Attention + FFN + residual.
+- Self-Attention là core operation cần phân tích.
 
-**Nội dung:**
-- **Recurrence (order N):**
-  ```
-  z^(n+1) = x^n · FFTConv(h^n, z^n)     n = 1,...,N
-  output  = z^(N+1)
-  ```
-- **2 nguyên thủy đơn giản:**
-  - 🔵 `FFTConv(h, v)`: Tích chập dài qua FFT — **O(L log L)** — global memory
-  - 🔴 `x^n · (...)`: Nhân element-wise (gating) — **O(L)** — data-controlled
-- **Hyena² (N=2) ≈ H3:** 2 bước recurrence, tương đương H3 mechanism
-- **Complexity tổng:** O(N · L log₂ L) vs O(L²) của Attention
+### Slide 6 — Self-Attention Mechanics
 
-**Hình/Bảng:** Sơ đồ recurrence (vẽ tay hoặc dùng Figure 1 từ bài báo)
+- Công thức: `Attention(Q,K,V) = softmax(QK^T / sqrt(d))V`.
+- Q, K, V là projections từ input.
+- Causal mask trong language modeling.
 
-**Speaker note:**
-> "Đây là slide trọng tâm nhất. Hyena chỉ cần 2 phép tính cực kỳ đơn giản: tích chập và nhân element-wise. Sức mạnh đến từ việc kết hợp chúng trong nhiều bước. Mỗi tích chập cho phép mô hình 'nhớ' thông tin từ xa — không bị giới hạn bởi cửa sổ local. Còn phép gating cho phép mô hình 'chọn lọc' thông tin dựa trên nội dung thực tế của chuỗi — tương tự vai trò của Q, K trong Attention."
+### Slide 7 — Attention Matrix
 
----
+- Ma trận attention kích thước `L x L`.
+- Mỗi token tương tác với các token trước đó.
+- Hình minh họa: L tăng thì số ô tăng theo bình phương.
 
-## SLIDE 6 — Implicit Long Filter
-**Tiêu đề:** Bộ Lọc Ngầm: Tham Số Nhỏ, Độ Nhớ Dài
+### Slide 8 — Bottleneck `O(L^2)`
 
-**Nội dung:**
-- **Công thức filter:**
-  `h_t = Window(t) · FFN(PositionalEncoding(t))`
-- **Tại sao "implicit"?**
-  - Explicit (CNN): lưu trực tiếp h ∈ R^L → số tham số = L
-  - **Implicit (Hyena):** học hàm γ_θ: t → h_t qua FFN → số tham số = O(1)
-- **Ưu điểm:**
-  - ✅ Filter length = L (toàn sequence) với ít tham số
-  - ✅ Học được decay, high-frequency patterns tự động
-  - ✅ Tách biệt memory (L) và parameter count
+- Time complexity: `O(L^2)`.
+- Memory complexity: `O(L^2)`.
+- Ví dụ: L tăng 2 lần thì số tương tác tăng khoảng 4 lần.
 
-**Hình/Bảng:** Visualize filter shape: exponential decay + high-frequency (Figure 3 bài báo)
+### Slide 9 — FlashAttention và Giới Hạn
 
-**Speaker note:**
-> "Thay vì lưu vector h của L giá trị — sẽ tốn O(L) tham số — Hyena dùng một mạng FFN nhỏ để 'sinh ra' giá trị h_t tại mỗi bước t. Điều này giống như học một công thức thay vì học từng số. Kết quả: filter có thể dài hàng nghìn token nhưng số tham số vẫn nhỏ và cố định."
+- FlashAttention tối ưu memory access và giảm bộ nhớ thực tế.
+- Nhưng compute vẫn là `O(L^2)`.
+- Vẫn khó mở rộng tới context cực dài.
+
+### Slide 10 — Capability Gap
+
+- Attention có 3 tính chất mạnh:
+  - Data control.
+  - Sublinear parameter scaling.
+  - Unrestricted context.
+- Các phương pháp thay thế attention trước Hyena thường thiếu một phần các tính chất này.
+
+### Slide 11 — Related Work
+
+- Transformer.
+- SSM/S4.
+- H3/GSS.
+- Hyena.
+- Mamba.
+- Mục tiêu: đặt Hyena vào dòng nghiên cứu attention-free / subquadratic models.
 
 ---
 
-## SLIDE 7 — Tại Sao Hyena Nhanh Hơn?
-**Tiêu đề:** Complexity Analysis: O(L log L) vs O(L²)
+## TV2 — Phương Pháp Hyena và Kết Quả Bài Báo Gốc
 
-**Nội dung:**
-- **So sánh complexity:**
+### Slide 12 — Từ Attention Sang Hyena
 
-| Phương pháp | Time | Memory |
+- Nhắc lại vấn đề: cần toán tử rẻ hơn Attention.
+- Nhưng vẫn cần data-controlled, context dài, ít tham số theo L.
+- Hyena xây toán tử mới thay vì xấp xỉ trực tiếp attention matrix.
+
+### Slide 13 — Ý Tưởng Chính
+
+- Hyena = long convolution + element-wise gating.
+- Long convolution mang thông tin toàn chuỗi.
+- Gating giúp chọn lọc theo input.
+
+### Slide 14 — Long Convolution
+
+- Filter dài bằng toàn bộ sequence.
+- Khác CNN local kernel.
+- Có khả năng mô hình hóa phụ thuộc xa.
+
+### Slide 15 — Data-Controlled Gating
+
+- Gate `x^n` phụ thuộc vào input.
+- Nhân element-wise với đầu ra convolution.
+- Đây là cơ chế giúp Hyena không chỉ là convolution tĩnh.
+
+### Slide 16 — Hyena Recurrence
+
+```text
+z^(n+1)_t = x^n_t * (h^n * z^n)_t
+```
+
+- `z^n`: trạng thái trung gian.
+- `h^n`: long convolution filter.
+- `x^n`: gate phụ thuộc input.
+
+### Slide 17 — Order-N Hierarchy
+
+- N là số bước recurrence.
+- N càng lớn, toán tử càng biểu diễn phong phú hơn.
+- Hyena bậc thấp liên hệ với H3/GSS.
+
+### Slide 18 — Matrix View
+
+- Gating tương ứng diagonal matrix.
+- Convolution tương ứng Toeplitz matrix.
+- Hyena là tích xen kẽ diagonal và Toeplitz matrices.
+
+### Slide 19 — Implicit Filter
+
+```text
+h_t = Window(t) * FFN(PositionalEncoding(t))
+```
+
+- Không học trực tiếp vector filter dài L.
+- Dùng FFN sinh filter theo vị trí.
+- Tách số tham số khỏi độ dài sequence.
+
+### Slide 20 — FFTConv
+
+- Convolution trực tiếp tốn nhiều chi phí.
+- Dùng FFT: `FFT -> multiply -> iFFT`.
+- Complexity giảm về `O(L log L)`.
+
+### Slide 21 — Complexity và Ý Nghĩa
+
+| Toán tử | Time | Memory |
 |---|---|---|
-| Standard Attention | O(L²) | O(L²) |
-| FlashAttention | O(L²) tính toán | O(L) |
-| **Hyena** | **O(N·L log L)** | **O(L)** |
+| Standard Attention | `O(L^2)` | `O(L^2)` |
+| FlashAttention | `O(L^2)` compute | thấp hơn thực tế |
+| Hyena | `O(N * L log L)` | gần tuyến tính theo L |
 
-- **Speedup thực tế (từ bài báo gốc):**
-  - **5x** nhanh hơn standard attention ở L=8,192
-  - **2x** nhanh hơn FlashAttention ở L=8,192
-  - **100x** nhanh hơn FlashAttention ở L=64,000
+### Slide 22 — Kết Quả Paper Gốc
 
-**Hình/Bảng:** Biểu đồ speedup từ bài báo (Figure về runtime)
-
-**Speaker note:**
-> "Cơ chế then chốt là dùng FFT để tính tích chập: thay vì O(L²) phép nhân trực tiếp, FFT chỉ cần O(L log L). Ở sequence length 64,000 — tương đương khoảng 50 trang sách — Hyena nhanh hơn FlashAttention 100 lần và chuẩn Attention thì đã hết RAM từ lâu."
+- Synthetic tasks: recall/reasoning dài.
+- WikiText-103 và The Pile: match Transformer ở một số setting.
+- Long-context speedup: nhanh hơn rõ ở L lớn.
+- Nhấn mạnh: kết quả này là của paper gốc, không phải của nhóm.
 
 ---
 
-## SLIDE 8 — Kết Quả Bài Báo Gốc
-**Tiêu đề:** Hyena vs Transformer: Kết Quả Trên Benchmark Lớn
+## TV3 — Reproduction và Thực Nghiệm Của Nhóm
 
-**Nội dung:**
-- **WikiText-103:** Hyena đạt **SotA cho attention-free architectures**
-- **The Pile (335M params):**
-  - Match Transformer perplexity
-  - Với **20% ít FLOP hơn**
-- **ImageNet (vision):** HyenaViT match standard ViT trong image classification
-- **Key message:** Lần đầu tiên attention-free model match Transformer ở scale lớn mà không cần hybridization
+### Slide 23 — Scope Của Nhóm
 
-**Hình/Bảng:** Bảng kết quả từ bài báo (Table 2 hoặc 3)
+- Không tái hiện full paper vì tài nguyên rất lớn.
+- Nhóm thực hiện small-scale reproduction.
+- Mục tiêu là trend verification, không phải match số tuyệt đối.
 
-**Speaker note:**
-> "Bài báo train mô hình 335 triệu tham số trên dataset 825GB — rõ ràng ngoài tầm với sinh viên. Nhưng kết quả rất đáng chú ý: Hyena là kiến trúc đầu tiên hoàn toàn không dùng attention mà vẫn match Transformer ở scale lớn. Điều này mở ra hướng thiết kế mô hình không phụ thuộc vào attention matrix."
+### Slide 24 — Mục Tiêu Reproduction
+
+- So sánh Transformer-small và Hyena-small.
+- Đánh giá PPL/loss ở WikiText-2.
+- Đo runtime/memory khi sequence length tăng.
+
+### Slide 25 — Dataset
+
+- WikiText-2.
+- GPT-2 tokenizer.
+- Sequence chunking theo `seq_len`.
+- Train/validation/test split.
+
+### Slide 26 — Pipeline
+
+```text
+Load WikiText-2 -> tokenize -> SequenceDataset -> DataLoader
+-> train model -> evaluate PPL/runtime/memory
+```
+
+### Slide 27 — Transformer-Small
+
+- GPT-like Transformer.
+- Layers, heads, d_model, d_ff.
+- Baseline để so sánh.
+
+### Slide 28 — Hyena-Small
+
+- HyenaLM trong repo.
+- Order N=2.
+- FFT-based, pure PyTorch.
+- Không dùng custom CUDA kernel.
+
+### Slide 29 — Training/Evaluation Setup
+
+- Optimizer: AdamW.
+- Metric: train loss, validation loss, perplexity.
+- Runtime/memory đo bằng `evaluate.py --scaling`.
+- Hardware cần ghi rõ: Colab T4/MPS/CPU.
+
+### Slide 30 — Kết Quả E1: PPL/Loss
+
+- Bảng Transformer vs Hyena tại L=256.
+- Cần điền số thật từ CSV train/evaluate.
+- Nếu chưa đủ epoch, ghi rõ là preliminary result.
+
+### Slide 31 — Kết Quả Scaling
+
+- Runtime/memory theo sequence length.
+- Transformer: 256, 512, 1024.
+- Hyena: 256, 512, 1024, 2048 nếu chạy được.
+- Dùng `results/plots/reproduce_runtime.png` nếu phù hợp.
+
+### Slide 32 — Thảo Luận và Giới Hạn
+
+- Scale nhỏ nên PPL có thể chưa phản ánh ưu thế của Hyena.
+- Pure PyTorch FFT có overhead, nhất là ở sequence ngắn.
+- Không có custom FFTConv/CUDA kernel như paper.
+- Kết quả nhóm chỉ minh họa xu hướng.
+
+### Slide 33 — Kết Luận & Q&A
+
+- Attention không phải con đường duy nhất.
+- Hyena là một hướng attention-free quan trọng.
+- Small-scale reproduction giúp nhóm hiểu trend và giới hạn thực tế.
+- Chuyển sang Q&A.
 
 ---
 
-## SLIDE 9 — Thiết Lập Thực Nghiệm Của Nhóm
-**Tiêu đề:** Small-Scale Reproduction: Scope Của Nhóm
+## Output Thực Nghiệm Cần Có Trước Khi Làm Slide
 
-**Nội dung:**
-- **Phương pháp:** Trend verification (không tái hiện số tuyệt đối)
-- **Dataset:** WikiText-2 (~2M tokens, HuggingFace)
-- **Mô hình so sánh:**
-
-| | Transformer-small | Hyena-small |
+| Mức | Output | Dùng cho slide |
 |---|---|---|
-| Layers | 4 | 4 |
-| d_model | 256 | 256 |
-| Heads/Order | 4 heads | N=2 |
-| Parameters | ~10M | ~10M |
-
-- **Experiments:** E1 (PPL), E2+E3 (scaling time/memory)
-- **Hardware:** Google Colab T4 GPU
-
-**Speaker note:**
-> "Nhóm thu nhỏ scope một cách có chủ đích. Mục tiêu không phải là tái hiện số perplexity chính xác như bài gốc, mà là quan sát xu hướng: Hyena có lợi thế gì khi sequence length tăng? Đây là cách tiếp cận hợp lý cho nhóm sinh viên với tài nguyên giới hạn."
+| Bắt buộc | Bảng setup dataset/model/hardware | 25-29 |
+| Bắt buộc | E1: train/evaluate Transformer-small và Hyena-small tại L=256 | 30 |
+| Bắt buộc | Ít nhất một bảng runtime scaling cho hai model | 31 |
+| Nên có | Plot loss/PPL hoặc runtime | 30-31 |
+| Bonus | Memory comparison hoặc synthetic recall | 31-32 |
 
 ---
 
-## SLIDE 10 — Kết Quả Thực Nghiệm
-**Tiêu đề:** Kết Quả: Transformer vs Hyena
+## Lệnh Gợi Ý Cho TV3
 
-**Nội dung:**
-- **E1 — Baseline (L=256):**
-  - [Bảng PPL Transformer vs Hyena sau N epoch]
-  - Nhận xét: tương đương ở scale nhỏ
-- **E2+E3 — Scaling:**
-  - [Bảng Time/Memory theo L: 256 → 512 → 1024]
-  - Khi L tăng 2x: Transformer time tăng ~4x, Hyena tăng ~2x
+```bash
+# E1: Train baseline tại L=256
+python train.py --model transformer --seq_len 256 --epochs 5 --batch_size 16
+python train.py --model hyena --seq_len 256 --epochs 5 --batch_size 16
 
-**Hình/Bảng:**
-- Loss curves (train/val theo epoch) — TV3 điền sau khi train
-- Bảng time/memory scaling — TV3 điền sau khi chạy E2/E3
-- [Placeholder: điền kết quả thực tế sau khi chạy]
+# E2/E3: Runtime scaling, không cần checkpoint
+python evaluate.py --model transformer --scaling --seq_lens 256 512 1024 --batch_size 8
+python evaluate.py --model hyena --scaling --seq_lens 256 512 1024 2048 --batch_size 8
+```
 
-**Speaker note:**
-> "Kết quả E1 cho thấy ở scale nhỏ, perplexity của hai mô hình khá gần nhau — điều này nhất quán với kết quả bài gốc: Hyena cần scale lớn để thể hiện rõ lợi thế về chất lượng ngôn ngữ. Tuy nhiên, ở E2 và E3, xu hướng scaling rõ ràng hơn: Hyena scale tốt hơn đáng kể về thời gian và bộ nhớ khi L tăng."
-
----
-
-## SLIDE 11 — Thảo Luận và Kết Luận
-**Tiêu đề:** Nhận Xét: Ưu và Nhược Điểm Của Hyena
-
-**Nội dung:**
-
-| | Ưu điểm | Nhược điểm |
-|---|---|---|
-| **Complexity** | O(L log L) thực sự subquadratic | Cần scale lớn để thấy lợi thế PPL |
-| **Memory** | Không lưu attention matrix L×L | FFT overhead ở sequence ngắn |
-| **Context** | Unbounded context (toàn sequence) | Implicit filter khó giải thích hơn |
-| **Code** | Pure PyTorch, không cần CUDA custom | Phức tạp hơn Transformer đơn thuần |
-
-- **Kết luận:** Hyena là bước đột phá quan trọng; Mamba (2023) đơn giản hóa thêm
-- **Hướng tương lai:** Mamba, Mamba-2, RetNet, RWKV
-
-**Speaker note:**
-> "Nhóm kết luận: Hyena đã chứng minh rằng attention không phải là cần thiết duy nhất để đạt chất lượng ngôn ngữ cao. Tuy nhiên, ở quy mô nhỏ — như thực nghiệm của nhóm — sự khác biệt về perplexity chưa rõ ràng. Điểm mạnh rõ ràng nhất là khả năng scaling với sequence length dài. Đây mở đường cho các kiến trúc sau như Mamba đơn giản hóa hơn nữa."
-
----
-
-## SLIDE 12 — Q&A và Tài Liệu Tham Khảo
-**Tiêu đề:** Cảm Ơn — Q&A
-
-**Nội dung:**
-- **GitHub:** [Link repo nhóm]
-- **Tài liệu tham khảo chính:**
-  1. Poli et al. (2023). *Hyena Hierarchy*. ICML 2023.
-  2. Vaswani et al. (2017). *Attention Is All You Need*. NeurIPS.
-  3. Gu et al. (2021). *S4*. ICLR 2022.
-  4. Dao et al. (2022). *H3*. ICLR 2023.
-  5. Dao et al. (2022). *FlashAttention*. NeurIPS.
-  6. Merity et al. (2016). *WikiText*. ICLR.
-
-**Hình/Bảng:** QR code link GitHub repo (tạo tại qr-code-generator.com)
-
-**Speaker note:**
-> "Xin cảm ơn thầy/cô và các bạn đã lắng nghe. Nhóm sẵn sàng trả lời câu hỏi. Toàn bộ code và kết quả thực nghiệm có thể truy cập tại GitHub repo của nhóm."
-
----
-
-## Hướng Dẫn Làm Slide
-
-### Công cụ đề xuất
-- **Google Slides:** Cộng tác dễ, share link trực tiếp
-- **Canva:** Template đẹp, nhiều hình minh họa sẵn
-- **PowerPoint:** Quen thuộc, xuất PDF dễ
-
-### Palette màu đề xuất
-- **Primary:** `#1E3A5F` (navy blue)
-- **Accent:** `#E74C3C` (red — dùng cho Hyena)
-- **Accent 2:** `#2980B9` (blue — dùng cho Transformer)
-- **Background:** `#F8F9FA` (light gray)
-- **Text:** `#2C3E50` (dark)
-
-### Font đề xuất
-- **Title:** Inter Bold hoặc Roboto Bold
-- **Body:** Inter Regular, size 18–20
-- **Code:** JetBrains Mono hoặc Consolas
-
-### Template layout đề xuất
-- Header: Màu primary `#1E3A5F`, chữ trắng
-- Body: Nền trắng/light gray
-- Footer: Tên nhóm + slide number
-- Highlight keyword: In đậm + màu accent
+Nếu không đủ thời gian/GPU, có thể giảm `epochs`, `batch_size`, hoặc chỉ chạy `seq_lens 256 512 1024` cho cả hai model. Khi trình bày phải ghi rõ đây là kết quả preliminary.

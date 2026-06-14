@@ -8,7 +8,7 @@
 
 Repo này phục vụ hai mục tiêu chính:
 
-1. **Trình bày lại bài báo Hyena Hierarchy** trong buổi seminar 30 phút và chuẩn bị 15 phút hỏi đáp.
+1. **Trình bày lại bài báo Hyena Hierarchy** trong buổi seminar 45 phút và chuẩn bị 15 phút hỏi đáp.
 2. **Tái hiện ở quy mô nhỏ** kiến trúc Hyena Hierarchy, so sánh với Transformer baseline trên dataset WikiText-2.
 
 **Mục tiêu:** Kiểm chứng xu hướng:
@@ -113,29 +113,100 @@ python evaluate.py --model hyena --checkpoint results/checkpoints/hyena_best.pt
 
 | ID | Mô tả | Dataset | Seq Length | Status |
 |---|---|---|---|---|
-| E1 | Baseline: Transformer vs Hyena PPL | WikiText-2 | 256 | `[ ] TODO` |
-| E2 | Scale seq length (Transformer) | WikiText-2 | 256→512→1024 | `[ ] TODO` |
-| E3 | Scale seq length (Hyena) | WikiText-2 | 256→512→1024→2048 | `[ ] TODO` |
+| E1 | Baseline: Transformer vs Hyena PPL/loss | WikiText-2 | 256 | Cần chạy/chốt số |
+| E2 | Scale seq length (Transformer runtime/memory) | WikiText-2 / dummy input | 256→512→1024 | Cần chạy/chốt số |
+| E3 | Scale seq length (Hyena runtime/memory) | WikiText-2 / dummy input | 256→512→1024→2048 | Cần chạy/chốt số |
 | E4 | GPU memory comparison | WikiText-2 | 256, 512, 1024 | `[ ] Bonus` |
 | E5 | Synthetic recall accuracy | Synthetic | 128, 256, 512 | `[ ] Bonus` |
+
+Output tối thiểu cần có cho slide thực nghiệm:
+
+| Output | File gợi ý | Dùng cho slide |
+|---|---|---|
+| E1 Transformer | `results/E1_transformer_L256.csv` | Slide 30 |
+| E1 Hyena | `results/E1_hyena_L256.csv` | Slide 30 |
+| E2 Transformer scaling | `results/E2_transformer_scale.csv` | Slide 31 |
+| E3 Hyena scaling | `results/E3_hyena_scale.csv` | Slide 31 |
+| Plot runtime/loss | `results/plots/reproduce_runtime.png` hoặc plot mới | Slide 30-31 |
+
+Phân công thực nghiệm:
+
+| Thành viên | Phụ trách | File liên quan | Output cần làm |
+|---|---|---|---|
+| TV1 | Metric và diễn giải kết quả | `docs/theory_attention.md`, `docs/paper_summary.md`, `docs/comparison_table.md` | Giải thích PPL/loss/runtime; nhận xét kết quả nhóm so với trend paper |
+| TV2 | Model setup và scaling analysis | `models/transformer.py`, `models/hyena.py`, `evaluate.py` | Bảng cấu hình model; kiểm tra E2/E3 runtime/memory có so sánh công bằng |
+| TV3 | Chạy pipeline và gom số liệu | `data/preprocess.py`, `train.py`, `evaluate.py`, `results/plots/reproduce_runtime.png` | CSV E1/E2/E3, bảng kết quả cuối, plot đưa lên slide |
+
+Lệnh gợi ý:
+
+```bash
+# E1: train/evaluate PPL ở L=256
+python train.py --model transformer --seq_len 256 --epochs 5 --batch_size 16
+python train.py --model hyena --seq_len 256 --epochs 5 --batch_size 16
+
+# E2/E3: đo runtime/memory scaling
+python evaluate.py --model transformer --scaling --seq_lens 256 512 1024 --batch_size 8
+python evaluate.py --model hyena --scaling --seq_lens 256 512 1024 2048 --batch_size 8
+```
+
+Nếu không đủ thời gian hoặc GPU, có thể giảm `epochs`, `batch_size`, hoặc chỉ chạy cùng một tập `seq_lens 256 512 1024` cho cả hai model. Khi đưa lên slide cần ghi rõ đây là kết quả preliminary nếu số epoch ít.
+
+---
+
+## ⚠️ Lưu Ý Quan Trọng
+
+### 1. Thực nghiệm là điểm nghẽn chính
+
+Hiện repo đã có code training/evaluation và một plot runtime, nhưng cần chốt thêm các file kết quả:
+
+- `results/E1_transformer_L256.csv`
+- `results/E1_hyena_L256.csv`
+- `results/E2_transformer_scale.csv`
+- `results/E3_hyena_scale.csv`
+
+Nếu chưa có đủ số liệu, slide 30-31 phải ghi rõ là **preliminary result** hoặc chỉ trình bày setup/kế hoạch thực nghiệm.
+
+### 2. Tách rõ kết quả paper và kết quả nhóm
+
+- Kết quả WikiText-103, The Pile, speedup 8K/64K là của **paper gốc**.
+- Kết quả WikiText-2, Transformer-small, Hyena-small là của **nhóm**.
+- Không dùng kết quả paper để nói như thể nhóm đã tái hiện được.
+
+### 3. Runtime scaling có thể dùng dummy input
+
+`evaluate.py --scaling` đo runtime/memory bằng input giả để kiểm tra xu hướng scaling theo sequence length. Khi trình bày cần nói rõ đây là **runtime scaling test**, không phải đánh giá PPL trên validation set.
+
+### 4. Hardware ảnh hưởng mạnh tới kết quả
+
+- Nếu chạy CUDA/GPU: có thể đo peak GPU memory.
+- Nếu chạy CPU/MPS: memory có thể không phản ánh đúng so sánh GPU.
+- Slide thực nghiệm phải ghi rõ hardware, batch size, sequence length, số epoch.
+
+### 5. Hyena có thể chưa nhanh hơn ở scale nhỏ
+
+Ở sequence length ngắn hoặc implementation pure PyTorch, Hyena có thể chậm do overhead FFT. Điều này không mâu thuẫn với paper, vì lợi thế của Hyena rõ hơn ở sequence dài và implementation được tối ưu.
+
+### 6. Slide Marp hiện chỉ là bản tham khảo
+
+`slides/slides.md` hiện là bản Marp tham khảo theo cấu trúc cũ. Nếu nhóm dùng Marp để trình chiếu chính, cần cập nhật lại theo outline 33 slide trong `slides/slide_outline.md`.
 
 ---
 
 ## 🎤 Chuẩn Bị Thuyết Trình
 
-Buổi seminar dự kiến gồm **30 phút trình bày** và **15 phút hỏi đáp**. Nhóm chia nội dung thành khoảng **24 slide**, mỗi thành viên phụ trách khoảng **8 slide**.
+Buổi seminar dự kiến gồm **45 phút trình bày** và **15 phút hỏi đáp**. Nhóm chia nội dung thành khoảng **33 slide**, mỗi thành viên phụ trách khoảng **11 slide**.
 
 | Thành viên | Slide | Nội dung chính |
 |---|---:|---|
-| TV1 | 1–8 | Nền tảng, motivation, Self-Attention, `O(L²)`, related work |
-| TV2 | 9–16 | Hyena operator, long convolution, gating, FFTConv, kết quả paper gốc |
-| TV3 | 17–24 | Small-scale reproduction, dataset, setup, kết quả nhóm, thảo luận |
+| TV1 | 1–11 | Nền tảng, motivation, Self-Attention, `O(L²)`, related work |
+| TV2 | 12–22 | Hyena operator, long convolution, gating, FFTConv, kết quả paper gốc |
+| TV3 | 23–33 | Small-scale reproduction, dataset, setup, kết quả nhóm, thảo luận |
 
 Tài liệu phân công chi tiết:
 
 - [`docs/phan_cong_present_hyena_3_tuan.md`](docs/phan_cong_present_hyena_3_tuan.md): phân công slide, output cần chuẩn bị, liên kết giữa các thành viên và Q&A.
 - [`slides/slide_outline.md`](slides/slide_outline.md): outline slide đề xuất.
-- [`slides/slides.md`](slides/slides.md): bản slide Marp hiện có.
+- [`slides/slides.md`](slides/slides.md): bản Marp tham khảo hiện có; cần cập nhật theo outline 33 slide nếu dùng làm slide trình chiếu chính.
 
 Phần hỏi đáp được chia theo phần trình bày:
 
@@ -161,6 +232,6 @@ Phần hỏi đáp được chia theo phần trình bày:
 
 | Thành viên | Vai trò | Phụ trách |
 |---|---|---|
-| TV1 | Nền tảng & Paper Survey | Motivation, Self-Attention, related work, slide 1–8 |
-| TV2 | Hyena Method & Paper Results | Hyena operator, FFTConv, kết quả paper gốc, slide 9–16 |
-| TV3 | Reproduction & Evaluation | Dataset, model setup, kết quả nhóm, slide 17–24 |
+| TV1 | Nền tảng & Paper Survey | Motivation, Self-Attention, related work, slide 1–11 |
+| TV2 | Hyena Method & Paper Results | Hyena operator, FFTConv, kết quả paper gốc, slide 12–22 |
+| TV3 | Reproduction & Evaluation | Dataset, model setup, kết quả nhóm, slide 23–33 |
