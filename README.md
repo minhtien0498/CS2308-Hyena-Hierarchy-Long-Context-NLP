@@ -33,11 +33,18 @@ Repo này phục vụ hai mục tiêu chính:
 ├── train.py                   # Training loop chính
 ├── evaluate.py                # Evaluation: val loss + perplexity + time
 ├── notebooks/
-│   ├── 02_model_training.ipynb      # Training walkthrough (Colab-ready)
+│   ├── colab_E1_run.ipynb          # ⭐ Notebook chính: train E1 + scaling trên Colab T4
+│   ├── 02_model_training.ipynb      # Training walkthrough
 │   └── reproduce.ipynb              # Notebook tái hiện nhanh
 ├── results/
+│   ├── E1_transformer_L256.csv     # E1: PPL/loss Transformer theo epoch
+│   ├── E1_hyena_L256.csv           # E1: PPL/loss Hyena theo epoch
+│   ├── E2_transformer_scale.csv    # E2: runtime/memory Transformer vs L
+│   ├── E3_hyena_scale.csv          # E3: runtime/memory Hyena vs L
+│   ├── checkpoints/                # Model weights (.pt — không commit, xem .gitignore)
 │   └── plots/
-│       └── reproduce_runtime.png    # Biểu đồ runtime reproduction
+│       ├── E1_ppl.png              # Biểu đồ PPL theo epoch (E1)
+│       └── reproduce_runtime.png   # Biểu đồ runtime reproduction
 ├── docs/
 │   ├── paper_summary.md            # Tóm tắt bài báo Hyena
 │   ├── theory_attention.md         # Lý thuyết Transformer + Attention
@@ -66,7 +73,7 @@ pip install -r requirements.txt
 
 ### 2. Chạy trên Google Colab
 
-Mở file `notebooks/02_model_training.ipynb` — notebook đã được thiết kế để chạy end-to-end trên Colab T4.
+Mở file `notebooks/colab_E1_run.ipynb` — notebook chạy end-to-end trên Colab T4 (check GPU → clone repo → train E1 → scaling E2/E3 → plot → tải `results.zip`). **Bắt buộc: Runtime → Change runtime type → T4 GPU → Run all.**
 
 ### 3. Chạy từng bước thủ công
 
@@ -81,8 +88,9 @@ python train.py --model transformer --seq_len 256 --epochs 20 --batch_size 16
 python train.py --model hyena --seq_len 256 --epochs 20 --batch_size 16
 
 # Bước 4: Evaluate cả hai
-python evaluate.py --model transformer --checkpoint results/checkpoints/transformer_best.pt
-python evaluate.py --model hyena --checkpoint results/checkpoints/hyena_best.pt
+# Checkpoint được lưu kèm timestamp, vd: results/checkpoints/transformer_L256_<timestamp>_best.pt
+python evaluate.py --model transformer --checkpoint results/checkpoints/<transformer_run>_best.pt
+python evaluate.py --model hyena --checkpoint results/checkpoints/<hyena_run>_best.pt
 ```
 
 ---
@@ -97,14 +105,15 @@ python evaluate.py --model hyena --checkpoint results/checkpoints/hyena_best.pt
 | Heads / Order | 4 heads | N=2 (Hyena²) |
 | Vocab size | 50257 (GPT-2) | 50257 (GPT-2) |
 | Max seq len | 1024 | 1024 |
-| Parameters | ~10M | ~10M |
+| Parameters | 16.1M | 16.3M |
 
 ---
 
 ## 📊 Dataset
 
-- **WikiText-2** (chính): `datasets.load_dataset("wikitext", "wikitext-2-raw-v1")`
-  - Train: ~2M tokens, Val: ~220K tokens, Test: ~245K tokens
+- **WikiText-2** (chính): `datasets.load_dataset("Salesforce/wikitext", "wikitext-2-raw-v1")`
+  - ⚠️ Dùng tên đầy đủ `Salesforce/wikitext`; `datasets`/`huggingface_hub` bản mới không còn nhận tên trần `"wikitext"` (lỗi `HfUriError`).
+  - Train: ~2.39M tokens, Val: ~247K tokens (GPT-2 BPE)
 - **Synthetic recall task** (bonus): Tự tạo bằng `data/synthetic_task.py`
 
 ---
@@ -113,11 +122,24 @@ python evaluate.py --model hyena --checkpoint results/checkpoints/hyena_best.pt
 
 | ID | Mô tả | Dataset | Seq Length | Status |
 |---|---|---|---|---|
-| E1 | Baseline: Transformer vs Hyena PPL/loss | WikiText-2 | 256 | Cần chạy/chốt số |
-| E2 | Scale seq length (Transformer runtime/memory) | WikiText-2 / dummy input | 256→512→1024 | Cần chạy/chốt số |
-| E3 | Scale seq length (Hyena runtime/memory) | WikiText-2 / dummy input | 256→512→1024→2048 | Cần chạy/chốt số |
+| E1 | Baseline: Transformer vs Hyena PPL/loss | WikiText-2 | 256 | ✅ Done (5ep, preliminary) |
+| E2 | Scale seq length (Transformer runtime/memory) | WikiText-2 / dummy input | 256→512→1024 | ✅ Done |
+| E3 | Scale seq length (Hyena runtime/memory) | WikiText-2 / dummy input | 256→512→1024→2048 | ✅ Done |
 | E4 | GPU memory comparison | WikiText-2 | 256, 512, 1024 | `[ ] Bonus` |
 | E5 | Synthetic recall accuracy | Synthetic | 128, 256, 512 | `[ ] Bonus` |
+
+### Kết quả (preliminary — 5 epoch, L=256, Colab T4)
+
+**E1 — Chất lượng (Validation PPL, param khớp ~16M):**
+
+| Model | Params | Val PPL (ep5) | Time/epoch |
+|---|---|---|---|
+| Transformer | 16.1M | 295.6 | ~88s |
+| **Hyena** | 16.3M | **251.8** | ~95s |
+
+→ Hyena PPL thấp hơn ~15% và thấp hơn ở mọi epoch. Loss vẫn đang giảm ở epoch 5 → **preliminary** (chạy `--epochs 20` để có số tốt hơn).
+
+**E2/E3 — Runtime scaling (mức toán tử):** Transformer scale siêu tuyến tính (O(L²)), Hyena ~tuyến tính (O(L log L)). Giao điểm ~L=512; tại L=1024 Hyena nhanh ~1.19×; Hyena chạy được tới L=2048.
 
 Output tối thiểu cần có cho slide thực nghiệm:
 
@@ -155,16 +177,15 @@ Nếu không đủ thời gian hoặc GPU, có thể giảm `epochs`, `batch_siz
 
 ## ⚠️ Lưu Ý Quan Trọng
 
-### 1. Thực nghiệm là điểm nghẽn chính
+### 1. Số liệu hiện có (preliminary)
 
-Hiện repo đã có code training/evaluation và một plot runtime, nhưng cần chốt thêm các file kết quả:
+Đã chạy đủ E1/E2/E3 trên Colab T4 — kết quả nằm trong `results/`:
 
-- `results/E1_transformer_L256.csv`
-- `results/E1_hyena_L256.csv`
-- `results/E2_transformer_scale.csv`
-- `results/E3_hyena_scale.csv`
+- `results/E1_transformer_L256.csv`, `results/E1_hyena_L256.csv`
+- `results/E2_transformer_scale.csv`, `results/E3_hyena_scale.csv`
+- `results/plots/E1_ppl.png`
 
-Nếu chưa có đủ số liệu, slide 30-31 phải ghi rõ là **preliminary result** hoặc chỉ trình bày setup/kế hoạch thực nghiệm.
+Đây là kết quả **5 epoch, chưa hội tụ** (loss vẫn đang giảm) → slide 30–31 phải ghi rõ **preliminary result**. Muốn số đẹp hơn: tăng `--epochs 20`.
 
 ### 2. Tách rõ kết quả paper và kết quả nhóm
 
@@ -184,7 +205,7 @@ Nếu chưa có đủ số liệu, slide 30-31 phải ghi rõ là **preliminary 
 
 ### 5. Hyena có thể chưa nhanh hơn ở scale nhỏ
 
-Ở sequence length ngắn hoặc implementation pure PyTorch, Hyena có thể chậm do overhead FFT. Điều này không mâu thuẫn với paper, vì lợi thế của Hyena rõ hơn ở sequence dài và implementation được tối ưu.
+Ở sequence length ngắn hoặc implementation pure PyTorch, Hyena có thể chậm do overhead FFT. **Số đo của nhóm xác nhận điều này:** Hyena chậm hơn ở L=256, hòa ~L=512, nhanh hơn ~1.19× ở L=1024 (xem `results/E2/E3_*.csv`). Không mâu thuẫn với paper — lợi thế của Hyena rõ hơn ở sequence dài và implementation được tối ưu.
 
 ### 6. Slide Marp hiện chỉ là bản tham khảo
 
