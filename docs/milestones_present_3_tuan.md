@@ -48,6 +48,19 @@ Phần hỏi đáp:
 
 Mốc dưới đây dùng dạng **T+N ngày**, trong đó **T0 là ngày nhóm chốt phân công**. Nếu nhóm bắt đầu ngay **14/06/2026**, có thể dùng cột ngày gợi ý.
 
+### 3.1 Bảng Deadline Tổng Quan Theo Tuần
+
+| Tuần | Mốc | Deadline gợi ý | Mục tiêu chính | Output cần có |
+|---|---|---|---|---|
+| Tuần 1 | M1.1 | 16/06/2026 | Đọc hiểu và chốt mạch từng phần | Mỗi người nắm phần mình; thống nhất mạch TV1 -> TV2 -> TV3 |
+| Tuần 1 | M1.2 | 20/06/2026 | Chốt bullet và visual thô | Mỗi người có bullet 11 slide; có bảng/hình/công thức chính |
+| Tuần 2 | M2.1 | 23/06/2026 | Chốt số liệu/speaker notes bản đầu | Có E1/E2/E3 hoặc preliminary result; mỗi người có speaker notes bản nháp |
+| Tuần 2 | M2.2 | 26/06/2026 | Call sync-up và Q&A bản đầu | Call ráp mạch; mỗi người có ít nhất 5 câu Q&A |
+| Tuần 3 | M3.1 | 01/07/2026 | Tổng duyệt lần 1 | Slide gần final; chạy thử 45 phút; ghi lại phần quá giờ/chưa rõ |
+| Tuần 3 | M3.2 | 04/07/2026 | Chốt bản cuối | Slide final; Q&A final; backup PDF/source/code |
+
+### 3.2 Milestone Chi Tiết
+
 | Milestone | Deadline tương đối | Nếu T0 = 14/06/2026 | Output cần có | Ai chịu trách nhiệm |
 |---|---:|---:|---|---|
 | M1 - Chốt scope và chia phần | T+0 | 14/06/2026 | Chốt 33 slide, mỗi người 11 slide | Cả nhóm |
