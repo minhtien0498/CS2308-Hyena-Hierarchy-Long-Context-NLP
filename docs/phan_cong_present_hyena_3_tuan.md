@@ -441,6 +441,7 @@ Output tối thiểu để sẵn sàng present:
 
 | File | Mục đích | Phụ trách |
 |---|---|---|
+| `docs/milestones_present_3_tuan.md` | Recap chung, milestone/deadline, output từng thành viên, agenda call sync-up | Cả nhóm |
 | `slides/slide_outline.md` | Outline slide chính | Cả nhóm |
 | `slides/slides.md` | Bản Marp tham khảo; cần cập nhật theo outline 33 slide nếu dùng để trình chiếu | Cả nhóm |
 | `docs/paper_summary.md` | Tóm tắt paper | TV1 |
