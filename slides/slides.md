@@ -139,6 +139,8 @@ $$
 
 <span class="small">Short recurrences thu được các mô hình cũ (H3, GSS) như trường hợp đặc biệt.</span>
 
+![width:750px](../docs/images/fig1_hyena_hierarchy.png)
+
 ---
 
 # 3 · Đào sâu toán học
@@ -158,6 +160,8 @@ $$
 - $S_h^{n} \in \mathbb{R}^{L\times L}$ — ma trận **Toeplitz** sinh bởi bộ lọc $h^n$ (chính là convolution).
 
 > So sánh trực quan (Figure 2): SelfAttention $y=A(q,k)v$ là **một** ma trận dày data-controlled; Hyena là **tích xen kẽ** đường chéo × Toeplitz — một phân rã thưa nhưng vẫn data-controlled, lấy cảm hứng từ *butterfly decomposition*.
+
+![width:850px](../docs/images/fig2_matrix_view.png)
 
 ---
 

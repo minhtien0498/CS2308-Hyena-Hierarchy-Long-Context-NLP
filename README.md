@@ -17,6 +17,28 @@ Repo này phục vụ hai mục tiêu chính:
 
 ---
 
+## 🏗️ Kiến Trúc Hyena Hierarchy
+
+Toán tử Hyena (Hyena operator) được đề xuất nhằm thay thế cơ chế Self-Attention trong Transformer bằng một toán tử dưới bậc hai (subquadratic) có độ phức tạp tính toán là $O(N \cdot L \log L)$ thay vì $O(L^2)$ với $L$ là độ dài chuỗi.
+
+Kiến trúc Hyena được xây dựng dựa trên việc lặp lại (recurrence) hai phép toán cơ bản có chi phí thấp:
+1. **Long Convolution (Tích chập dài):** Tận dụng bộ lọc chập có kích thước bằng toàn bộ sequence length ($L$) để mô hình hóa các phụ thuộc xa, tính toán cực kỳ hiệu quả thông qua FFTConv.
+2. **Data-Controlled Gating (Cơ chế cổng):** Áp dụng phép nhân element-wise từ các hình chiếu (projections) của input để tạo sự phụ thuộc vào ngữ cảnh đầu vào (tính chất động giống Attention, khắc phục nhược điểm tĩnh của CNN truyền thống).
+
+### 1. Sơ đồ khối toán tử Hyena (Hyena Operator Recurrence)
+Cấu trúc ghép lớp Hyena với $N$ bước recurrence xen kẽ giữa nhân chập và gating:
+
+![Sơ đồ khối toán tử Hyena Hierarchy](docs/images/fig1_hyena_hierarchy.png)
+
+### 2. Góc nhìn ma trận (Matrix View Comparison)
+So sánh cấu trúc toán học giữa Self-Attention và Hyena:
+- **Self-Attention:** Trực tiếp tính toán và lưu trữ ma trận attention dày đặc (dense matrix) kích thước $L \times L$.
+- **Hyena:** Phân rã toán tử thành tích xen kẽ của các ma trận đường chéo $D_x$ (phép gating) và ma trận Toeplitz $S_h$ (phép chập nhân quả).
+
+![So sánh Matrix View giữa Attention và Hyena](docs/images/fig2_matrix_view.png)
+
+---
+
 ## 🗂️ Cấu Trúc Thư Mục
 
 ```
