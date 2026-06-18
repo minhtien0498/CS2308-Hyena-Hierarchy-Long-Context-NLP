@@ -61,6 +61,7 @@ Stanford & Mila — ICML 2023 (PMLR 202)
 4. **Dữ liệu & Đánh giá** — synthetic benchmark + chuẩn (Q3, Q4)
 5. **Kết quả & Ảnh hưởng** (Q5)
 6. **Đề xuất nghiên cứu tiếng Việt** (Q6)
+7. **Tái hiện quy mô nhỏ**: Transformer-small và Hyena-small trên WikiText-2 (Nhóm)
 
 > ⚠️ Bài *poli23a* không phải về Natural Language Inference — đây là bài về **kiến trúc mô hình ngôn ngữ** (thay thế attention).
 
@@ -298,6 +299,95 @@ $$
 4. **Downstream:** tóm tắt văn bản luật dài, QA hồ sơ y khoa, NER văn bản dài — vs PhoBERT/ViT5.
 
 **Kỳ vọng:** kiến trúc subquadratic hợp đặc tính "chuỗi dài" của tiếng Việt; mô hình nền mở, chi phí thấp cho NLP tiếng Việt.
+
+---
+
+# (từ đây là của TV3)
+---
+
+<!-- _class: lead -->
+
+# 7 · Tái hiện quy mô nhỏ (Nhóm)
+## *small-scale reproduction trên WikiText-2*
+
+---
+
+## Phạm vi & mục tiêu
+
+Nhóm không tái hiện toàn bộ paper, vì The Pile 800GB và GPU lớn vượt quá tài nguyên môn học. Thay vào đó nhóm làm tái hiện ở quy mô nhỏ, mục tiêu là kiểm chứng xu hướng chứ không khớp số tuyệt đối.
+
+<div class="box">
+
+Hai câu hỏi nhóm muốn tự trả lời:
+1. Ở quy mô nhỏ, perplexity của Hyena có ngang Transformer không?
+2. Khi chuỗi dài ra, Hyena có lợi thế tốc độ như paper dự đoán không?
+
+</div>
+
+Code do nhóm tự cài bằng thuần PyTorch, có đối chiếu với bản chính chủ `HazyResearch/safari`.
+
+---
+
+## Thiết lập thực nghiệm
+
+Dữ liệu: WikiText-2, tokenizer GPT-2, cắt chuỗi theo độ dài 256.
+
+| Cấu hình | Transformer-small | Hyena-small |
+|---|---|---|
+| Layers | 4 | 4 |
+| `d_model` / `d_ff` | 256 / 1024 | 256 / 1024 |
+| Trộn thông tin | 4 heads attention | order N=2, FFTConv |
+| Params | 16.1M | 16.3M |
+
+Hyena dùng `torch.fft.rfft` thuần PyTorch, không có custom CUDA kernel.
+Huấn luyện bằng AdamW kèm warmup rồi cosine, đánh giá bằng val loss quy ra perplexity, chạy trên Colab T4.
+
+---
+
+## Kết quả E1: Perplexity (L=256)
+
+| Model | Val loss | Val PPL |
+|---|---|---|
+| Transformer-small | 5.69 | 295.6 |
+| Hyena-small | 5.53 | 251.8 |
+
+<span class="small">Kết quả sơ bộ sau 5 epoch, chạy bằng notebook <code>notebooks/colab_E1_run.ipynb</code>. Loss vẫn đang giảm nên đây là số minh hoạ xu hướng, chưa phải mức hội tụ cuối.</span>
+
+Nhận xét: hai model cùng cỡ tham số cho perplexity cùng tầm, Hyena còn nhỉnh hơn một chút. Đủ để nói Hyena là một baseline ngôn ngữ hợp lệ ở quy mô này.
+
+---
+
+## Kết quả: tốc độ theo độ dài chuỗi
+
+Đo trực tiếp ở mức toán tử (CPU, batch 1, d_model 64), tăng dần độ dài L:
+
+| L | Attention (ms) | Hyena (ms) | Tỉ lệ |
+|---|---|---|---|
+| 256 | 0.18 | 0.34 | Hyena chậm hơn |
+| 1024 | 1.56 | 1.51 | hai bên hòa nhau |
+| 4096 | 22.39 | 7.64 | Hyena nhanh gấp 2.9 lần |
+
+Attention tăng theo bình phương độ dài, còn Hyena tăng gần tuyến tính. Chuỗi càng dài thì Hyena càng thắng đậm.
+
+---
+
+## Thảo luận và giới hạn
+
+- Ở chuỗi ngắn Hyena chậm hơn, vì chi phí FFT và đệm 2L lớn hơn phần tiết kiệm được. Hyena chỉ vượt lên từ khoảng L bằng 1024, đúng như lưu ý trong paper.
+- Bản cài của nhóm có đơn giản hóa so với safari: filter dùng SiLU thay cho activation dạng sin, modulation rút gọn, bỏ skip-connection. Vì vậy hội tụ có thể chậm hơn bản gốc.
+- Vì dùng thuần PyTorch và không có CUDA kernel, nhóm chưa đạt mức speedup tuyệt đối như paper.
+- Phần đo tốc độ là đo toán tử trên CPU với d_model nhỏ, nên chỉ phản ánh xu hướng chứ không phải đánh giá perplexity.
+- Cần phân biệt rõ: số trên WikiText-103, The Pile và speedup từ 8K đến 64K là của paper gốc, còn số WikiText-2 ở đây là của nhóm.
+
+---
+
+## Kết luận phần tái hiện
+
+- Nhóm tự cài Hyena bằng thuần PyTorch, phần lõi khớp với bản chính chủ ở FFTConv đệm 2L, short conv depthwise và gating đệ quy bậc N.
+- Quan sát đúng xu hướng chính của bài: tốc độ Hyena tăng gần tuyến tính, attention tăng theo bình phương, hai đường giao nhau quanh L bằng 1024.
+- Bài học rút ra: hiểu được vì sao attention nghẽn ở chuỗi dài, và thấy được giới hạn thực tế của tái hiện khi thiếu kernel tối ưu và tài nguyên.
+
+> Quy mô nhỏ nhưng đủ để thấy tận mắt cơ chế dưới bậc hai mà bài báo đề xuất.
 
 ---
 

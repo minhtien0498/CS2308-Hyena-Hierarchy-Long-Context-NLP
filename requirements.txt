@@ -1,6 +1,6 @@
 torch>=2.0.0
 transformers>=4.30.0
-datasets>=2.12.0
+datasets>=2.12.0,<3   # <3: tránh thay đổi API gây lỗi load_dataset (dùng kèm tên "Salesforce/wikitext")
 numpy>=1.24.0
 matplotlib>=3.7.0
 pandas>=2.0.0
