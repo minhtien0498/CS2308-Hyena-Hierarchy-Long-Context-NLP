@@ -12,13 +12,13 @@
 
 | Thành viên | Slide | Nội dung |
 |---|---:|---|
-| TV1 | 1-11 | Nền tảng, motivation, Self-Attention, related work |
-| TV2 | 12-22 | Hyena operator, FFTConv, implicit filter, kết quả paper gốc |
-| TV3 | 23-33 | Reproduction của nhóm, thực nghiệm, thảo luận, kết luận |
+| Kiên | 1-11 | Nền tảng, motivation, Self-Attention, related work |
+| Tiến | 12-22 | Hyena operator, FFTConv, implicit filter, kết quả paper gốc |
+| Quang | 23-33 | Reproduction của nhóm, thực nghiệm, thảo luận, kết luận |
 
 ---
 
-## TV1 — Nền Tảng và Motivation
+## Kiên — Nền Tảng và Motivation
 
 ### Slide 1 — Trang Bìa
 
@@ -93,7 +93,7 @@
 
 ---
 
-## TV2 — Phương Pháp Hyena và Kết Quả Bài Báo Gốc
+## Tiến — Phương Pháp Hyena và Kết Quả Bài Báo Gốc
 
 ### Slide 12 — Từ Attention Sang Hyena
 
@@ -174,7 +174,7 @@ h_t = Window(t) * FFN(PositionalEncoding(t))
 
 ---
 
-## TV3 — Reproduction và Thực Nghiệm Của Nhóm
+## Quang — Reproduction và Thực Nghiệm Của Nhóm
 
 ### Slide 23 — Scope Của Nhóm
 
