@@ -3,7 +3,7 @@ plot_scaling.py — Vẽ biểu đồ scaling từ E2/E3 CSV.
 TV2 deliverable (phan_cong §8.2: phần scaling runtime).
 
 Usage:
-  python docs/tv2_hyena_method/experiment/plot_scaling.py
+  python tv2_hyena_method/experiment/plot_scaling.py
 
 Input:
   E2_transformer_scale.csv, E3_hyena_scale.csv  (cùng thư mục hoặc results/)
@@ -20,7 +20,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 HERE = Path(__file__).resolve().parent
-ROOT = HERE.parents[3]  # repo root
+ROOT = HERE.parents[1]  # repo root
 RESULTS = ROOT / "results"
 
 

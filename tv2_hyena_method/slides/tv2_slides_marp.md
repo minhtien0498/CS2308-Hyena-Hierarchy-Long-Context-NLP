@@ -1,96 +1,164 @@
 ---
 marp: true
-title: "Hyena Method & Paper Results"
-author: "Tiến - Nhóm 8"
+title: "TV2 - Hyena Method & Paper Results"
+author: "To Huynh Minh Tien - Nhom 08"
 paginate: true
+html: true
 math: katex
 backgroundColor: "#ffffff"
-color: "#1f2937"
+color: "#1d2b36"
 style: |
+  @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,600;0,700;1,400&display=swap');
   section {
-    font-family: "Helvetica Neue", "Segoe UI", system-ui, sans-serif;
-    font-size: 25px;
-    padding: 54px 64px;
+    font-family: "Be Vietnam Pro", "Segoe UI", system-ui, sans-serif;
+    font-size: 24px;
+    padding: 100px 64px 64px 64px;
     background: #ffffff;
-    color: #1f2937;
-  }
-  h1 {
-    color: #111827;
-    font-size: 44px;
-    border-bottom: 2px solid #d1d5db;
-    padding-bottom: 8px;
+    color: #1d2b36;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start !important;
+    align-content: flex-start;
   }
   h2 {
-    color: #1f2937;
-    font-size: 34px;
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    margin: 0;
+    background: #1F3A68;
+    color: #ffffff !important;
+    font-size: 30px;
+    font-weight: 600;
+    padding: 16px 64px;
   }
-  h3 {
-    color: #1f2937;
-    font-size: 27px;
-    margin-bottom: 6px;
-  }
-  strong { color: #111827; }
-  em { color: #374151; font-style: normal; }
+  h3 { color:#1F3A68; font-size:24px; margin-bottom:4px; }
+  strong { color:#1F3A68; }
+  em { color:#1d4ed8; font-style:normal; }
+  a { color:#1F3A68; }
   code {
-    background: #f3f4f6;
-    color: #111827;
+    background: #e7edf6;
+    color: #1F3A68;
     padding: 1px 6px;
     border-radius: 4px;
   }
+  ul { list-style:none; padding-left:6px; }
+  ul li { position:relative; padding-left:24px; margin:10px 0; }
+  ul li::before { content:"●"; color:#1F3A68; font-size:14px; position:absolute; left:0; top:4px; }
+  ol li { margin:10px 0; }
   table {
     font-size: 21px;
     border-collapse: collapse;
+    margin: 6px 0;
   }
-  th {
-    background: #f3f4f6;
-    color: #111827;
-  }
-  td {
-    background: #ffffff;
-    color: #1f2937;
-  }
-  td, th {
-    border: 1px solid #d1d5db;
-    padding: 6px 10px;
-  }
+  th { background:#1F3A68; color:#ffffff; }
+  td { background:#ffffff; }
+  td, th { border:1px solid #c3d2ea; padding:5px 12px; }
   blockquote {
-    border-left: 4px solid #9ca3af;
-    color: #374151;
-    padding-left: 18px;
-    background: #f9fafb;
+    border-left:4px solid #1F3A68;
+    background:#e7edf6;
+    color:#20324f;
+    padding:8px 18px;
+  }
+  footer {
+    left:0;
+    bottom:0;
+    width:100%;
+    box-sizing:border-box;
+    display:flex;
+    padding:0;
+    height:26px;
+    font-size:13px;
+    color:#ffffff;
+    background:linear-gradient(90deg,#0e1d38 0%,#16294d 30%,#1f3a68 62%,#2a4d86 100%);
+  }
+  footer span {
+    flex:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-right:1px solid rgba(255,255,255,.3);
+  }
+  footer span:nth-child(4) { flex:0 0 64px; }
+  footer span:last-child { border-right:none; }
+  section::after {
+    position:absolute;
+    right:18px;
+    bottom:5px;
+    z-index:10;
+    color:#ffffff;
+    font-weight:600;
+    font-size:13px;
+    content: attr(data-marpit-pagination) " / " attr(data-marpit-pagination-total);
+  }
+  header {
+    position:absolute;
+    top:9px;
+    right:16px;
+    left:auto;
+    margin:0;
+    padding:0;
+    background:none;
+    box-shadow:none;
+    z-index:40;
+  }
+  header img {
+    height:50px;
+    width:50px;
+    object-fit:contain;
+    display:block;
+    background:#ffffff;
+    border-radius:50%;
+    padding:5px;
+    box-sizing:border-box;
+    box-shadow:0 1px 5px rgba(0,0,0,.22);
   }
   section.lead {
     text-align: center;
+    justify-content: flex-start;
   }
-  section.lead h1 {
-    border: none;
-    font-size: 48px;
+  .titlebox {
+    width:100%;
+    box-sizing:border-box;
+    background:#1F3A68;
+    border-radius:10px;
+    padding:24px 40px;
+    margin:48px 0 30px 0;
+    box-shadow:0 5px 12px rgba(0,0,0,.18);
+    text-align:center;
   }
+  .titlebox h1 {
+    background:none;
+    border:none;
+    box-shadow:none;
+    display:block;
+    color:#ffffff !important;
+    font-size:38px;
+    margin:0;
+    padding:0;
+  }
+  .titlebox h3 { color:#ffffff !important; font-weight:400; margin:8px 0 0 0; }
+  section.lead h1 { color:#1F3A68; font-size:42px; }
+  section.lead h3 { color:#1d2b36; font-weight:400; margin-top:0; }
   .small {
-    font-size: 19px;
-    color: #6b7280;
-  }
-  .tiny {
-    font-size: 16px;
-    color: #6b7280;
+    font-size:18px;
+    color:#777;
   }
   .box {
-    background: #f9fafb;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    padding: 14px 18px;
+    background:#e7edf6;
+    border:1px solid #c3d2ea;
+    border-radius:10px;
+    padding:12px 20px;
   }
   .warn {
-    background: #f9fafb;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    padding: 12px 16px;
+    background:#f4f7fb;
+    border:1px solid #c3d2ea;
+    border-radius:10px;
+    padding:12px 20px;
   }
   .pipeline {
-    background: #ffffff;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    padding: 12px 16px;
+    background:#ffffff;
+    border:1px solid #c3d2ea;
+    border-radius:10px;
+    padding:12px 16px;
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     font-size: 20px;
     line-height: 1.65;
@@ -120,22 +188,24 @@ style: |
   .tight li {
     font-size: 22px;
   }
-  footer {
-    color: #9ca3af;
-    font-size: 14px;
-  }
-footer: "Hyena Hierarchy (Poli et al., ICML 2023) - CS2308"
+footer: '<span>Nhóm 08 · CS2308</span><span>TV2 · Hyena Method</span><span>2026</span><span></span>'
+header: '<img src="../../slides/assets/UIT_logo.svg" alt="UIT">'
 ---
 
 <!-- _class: lead -->
 <!-- _paginate: false -->
 
-# Hyena Method
-### Long Convolution + Gating thay thế Self-Attention
+<div class="titlebox">
+
+# TV2 - Hyena Method
+### Long Convolution + Gating thay the Self-Attention
+
+</div>
 
 <br>
 
-**Tiến · Nhóm 8** · Hyena Hierarchy, Poli et al., ICML 2023
+**Tô Huỳnh Minh Tiến · Nhóm 08**
+Hyena Hierarchy, Poli et al., ICML 2023
 
 <!--
 Notes:
@@ -145,7 +215,7 @@ Mục tiêu: giải thích Hyena hoạt động như thế nào và paper gốc 
 
 ---
 
-# Từ Attention Sang Hyena
+## Từ Attention Sang Hyena
 
 <div class="box">
 
@@ -171,9 +241,9 @@ Nhấn mạnh Hyena không phải "attention approximation".
 
 ---
 
-# Ý Tưởng Chính Của Hyena
+## Ý Tưởng Chính Của Hyena
 
-## Hyena = Long Convolution + Data-Controlled Gating
+### Hyena = Long Convolution + Data-Controlled Gating
 
 <div class="grid2">
 
@@ -216,9 +286,9 @@ Notes:
 
 ---
 
-# Long Convolution
+## Long Convolution
 
-## Từ local kernel sang full-context filter
+### Từ local kernel sang full-context filter
 
 | Mô hình | Kernel/filter | Phạm vi nhìn |
 |---|---|---|
@@ -244,9 +314,9 @@ Causal conv chỉ nhìn quá khứ, phù hợp language modeling.
 
 ---
 
-# Data-Controlled Gating
+## Data-Controlled Gating
 
-## Vì sao cần gating?
+### Vì sao cần gating?
 
 - Convolution thuần thường khá **tĩnh**: cùng filter áp dụng cho mọi input.
 - Language modeling cần chọn lọc theo **ngữ cảnh input**.
@@ -280,9 +350,9 @@ Gate không phải cổng logic 0/1 cứng; nó là tín hiệu liên tục, h�
 
 ---
 
-# Hyena Recurrence
+## Hyena Recurrence
 
-## Công thức trung tâm
+### Công thức trung tâm
 
 $$
 z^{n+1}_t = x^n_t \cdot (h^n * z^n)_t
@@ -325,9 +395,9 @@ Nếu bị hỏi "Hyena khác CNN ở đâu?", quay lại đây: CNN chủ yếu
 
 ---
 
-# Order-N Hierarchy
+## Order-N Hierarchy
 
-## Vì sao gọi là "Hierarchy"?
+### Vì sao gọi là "Hierarchy"?
 
 - Hyena có thể lặp nhiều bước **convolution + gating**.
 - `N` càng lớn, operator càng biểu diễn phong phú hơn.
@@ -351,9 +421,9 @@ Không cần giải thích sâu H3/GSS, chỉ nói Hyena tổng quát hóa ý t�
 
 ---
 
-# Matrix View
+## Matrix View
 
-## Trực giác ma trận
+### Trực giác ma trận
 
 | Thành phần Hyena | Dạng ma trận | Trực giác |
 |---|---|---|
@@ -381,9 +451,9 @@ Nếu thầy hỏi sâu: D_x là diagonal nên nhân rẻ; S_h có cấu trúc c
 
 ---
 
-# Implicit Filter
+## Implicit Filter
 
-## Filter dài nhưng ít tham số
+### Filter dài nhưng ít tham số
 
 $$
 h_t = \mathrm{Window}(t) \cdot \mathrm{FFN}(\mathrm{PE}(t))
@@ -409,9 +479,9 @@ Notes:
 
 ---
 
-# FFTConv
+## FFTConv
 
-## Tính long convolution hiệu quả
+### Tính long convolution hiệu quả
 
 <div class="box">
 
@@ -448,9 +518,9 @@ y = torch.fft.irfft(Y, n=fft_len, dim=-1)[..., :L]
 
 <!-- _class: tight -->
 
-# Complexity Và Ý Nghĩa
+## Complexity Và Ý Nghĩa
 
-## Điểm rơi của Hyena là context dài
+### Điểm rơi của Hyena là context dài
 
 | Method | Time | Memory |
 |---|---|---|
@@ -478,9 +548,9 @@ L = 64K: L^2 khoảng 4.1B, L log2 L khoảng 1M.
 
 ---
 
-# Kết Quả Paper Gốc
+## Kết Quả Paper Gốc
 
-## Paper chứng minh 2 thứ: quality và efficiency
+### Paper chứng minh 2 thứ: quality và efficiency
 
 <div class="grid2">
 
