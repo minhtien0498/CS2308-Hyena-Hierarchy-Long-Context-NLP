@@ -79,7 +79,7 @@ if cross:
 
 ax.set_xlabel("Sequence length L", fontsize=12)
 ax.set_ylabel("Time / forward step (ms)", fontsize=12)
-ax.set_title("Scaling: Transformer vs Hyena  (d_model=256, 4 layers, batch=8, MPS)",
+ax.set_title("Scaling: Transformer vs Hyena  (d_model=256, 4 layers, batch=8, Colab T4)",
              fontsize=11)
 ax.grid(True, which="both", alpha=0.3)
 ax.legend(fontsize=9, loc="upper left")

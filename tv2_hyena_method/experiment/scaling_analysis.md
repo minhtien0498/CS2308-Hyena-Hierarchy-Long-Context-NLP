@@ -1,9 +1,9 @@
-# TV2 - Scaling Analysis (E2/E3, số thật)
+# TV2 - Scaling Analysis (E2/E3, đồng bộ với `results/`)
 
 > Phục vụ yêu cầu [phan_cong_present_hyena_3_tuan.md §8.3](../../phan_cong_present_hyena_3_tuan.md):
 > *"CSV scaling E2/E3: TV3 tạo + TV2 phân tích scaling runtime/memory và liên hệ complexity."*
 >
-> **Lưu ý phụ trách:** CSV do lệnh `evaluate.py --scaling` sinh (TV2 đã chạy vì TV3 chưa nộp). Phần **phân tích + liên hệ complexity là của TV2**. Khi TV3 chạy lại trên GPU/Colab, thay số vào đây — mạch phân tích giữ nguyên.
+> **Lưu ý phụ trách:** TV2 từng dùng bộ số tạm thời để viết khung phân tích. File này đã được **đồng bộ lại theo CSV chính thức trong `results/`** để TV2 và TV3 cùng dùng một bộ số.
 
 ---
 
@@ -13,11 +13,11 @@
 |---|---|
 | Lệnh | `python evaluate.py --model {transformer,hyena} --scaling --seq_lens ... --batch_size 8` |
 | d_model | 256 · n_layers 4 · batch 8 · dropout 0.0 |
-| Device | **MPS** (Apple Silicon), torch 2.12 |
+| Device | **Colab T4 (CUDA)** |
 | Đo | warmup 5 + measure 20 forward pass, dummy input |
 | Tham số | Transformer 16.28M / Hyena 16.45M (chênh ~1%, so sánh công bằng) |
 | File | [E2_transformer_scale.csv](E2_transformer_scale.csv), [E3_hyena_scale.csv](E3_hyena_scale.csv) |
-| Ngày chạy | 15/06/2026 |
+| Nguồn số | đồng bộ từ [results/](../../results/) |
 
 ---
 
@@ -25,47 +25,46 @@
 
 ### E2 — Transformer (Attention)
 
-| L | Time/step (ms) | Tăng / nhân đôi L | Throughput (k tok/s) |
-|---:|---:|---|---:|
-| 256 | 17.31 | — | 118.3 |
-| 512 | 49.83 | **2.88×** | 82.2 |
-| 1024 | 149.38 | **3.00×** | 54.8 |
+| L | Time/step (ms) | Tăng / nhân đôi L | Throughput (k tok/s) | Peak mem (MB) |
+|---:|---:|---|---:|---:|
+| 256 | 21.41 | — | 95.7 | 466.3 |
+| 512 | 43.71 | **2.04x** | 93.7 | 862.7 |
+| 1024 | 100.14 | **2.29x** | 81.8 | 1654.8 |
 
-256→1024 (×4 L): time tăng **8.63×**.
+256→1024 (x4 L): time tăng **4.68x**.
 
 ### E3 — Hyena
 
-| L | Time/step (ms) | Tăng / nhân đôi L | Throughput (k tok/s) |
-|---:|---:|---|---:|
-| 256 | 33.29 | — | 61.5 |
-| 512 | 65.57 | **1.97×** | 62.5 |
-| 1024 | 131.70 | **2.01×** | 62.2 |
-| 2048 | 276.21 | **2.10×** | 59.3 |
+| L | Time/step (ms) | Tăng / nhân đôi L | Throughput (k tok/s) | Peak mem (MB) |
+|---:|---:|---|---:|---:|
+| 256 | 21.85 | — | 93.7 | 466.7 |
+| 512 | 42.38 | **1.94x** | 96.7 | 862.3 |
+| 1024 | 84.07 | **1.98x** | 97.4 | 1651.4 |
+| 2048 | 167.82 | **2.00x** | 97.6 | 3231.9 |
 
-256→1024 (×4 L): time tăng **3.95×**.
+256→1024 (x4 L): time tăng **3.85x**.
 
 ---
 
 ## 3. Đọc Số — 3 Điểm Chính
 
-### 3.1 Tỉ lệ scaling khớp lý thuyết
-- **Hyena ~2.0× mỗi lần nhân đôi L** (1.97 → 2.01 → 2.10) → đúng dấu hiệu `O(L log L)`.
-- **Transformer ~2.9–3.0× và đang tăng** (2.88 → 3.00) → tiến dần về 4× đặc trưng của `O(L²)` khi `L` lớn; ở `L` nhỏ component tuyến tính (FFN, embedding) làm giảm tỉ lệ.
+### 3.1 Tỉ lệ scaling khớp lý thuyết hơn bản MPS cũ
+- **Hyena ~2.0x mỗi lần nhân đôi L** (1.94 -> 1.98 -> 2.00) -> rất sát dấu hiệu `O(L log L)`.
+- **Transformer tăng nhanh hơn** (2.04 -> 2.29) và có xu hướng tiếp tục cong thêm khi `L` lớn hơn; dải này chưa đủ lớn để thấy mức 4x rõ nét của `O(L^2)`, nhưng quãng 256->1024 đã cao hơn Hyena.
 
-### 3.2 Throughput: chênh rõ nhất
-Đây là hình minh họa mạnh nhất cho slide:
+### 3.2 Throughput: Hyena gần như phẳng, Transformer bắt đầu giảm
 
-| | L=256 | L=1024 | Giảm |
+| | L=256 | L=1024 | Biến động |
 |---|---:|---:|---|
-| Transformer | 118.3 k tok/s | 54.8 k tok/s | **−54%** |
-| Hyena | 61.5 k tok/s | 62.2 k tok/s | **gần phẳng** (dao động ±4%) |
+| Transformer | 95.7 k tok/s | 81.8 k tok/s | **-14.5%** |
+| Hyena | 93.7 k tok/s | 97.4 k tok/s | **gần phẳng** (+4.0%) |
 
-→ Throughput Hyena gần như **không đổi** khi `L` tăng (vì `time ∝ L log L` ⇒ `throughput = L/time ∝ 1/log L` giảm chậm), trong khi Transformer **sụp** theo `1/L`. Xem [scaling_throughput.png](scaling_throughput.png).
+-> Với bộ số Colab/CUDA mới, Hyena không còn bị "đứt throughput" ở dải vừa; đường throughput gần như nằm ngang, trong khi Transformer giảm rõ khi `L` tăng. Xem [scaling_throughput.png](scaling_throughput.png).
 
 ### 3.3 Điểm crossover
-Tại L=512 Hyena **chậm hơn** (65.6 vs 49.8 ms); tại L=1024 Hyena **nhanh hơn** (131.7 vs 149.4 ms). **Crossover ≈ L 750–1000** (plot báo L=1024 — điểm đầu tiên Hyena vượt). Xem [scaling_time.png](scaling_time.png).
+Tại L=256 Hyena **hơi chậm hơn** (21.85 vs 21.41 ms), nhưng tới L=512 Hyena đã **nhanh hơn** (42.38 vs 43.71 ms) và giữ lợi thế tại L=1024 (84.07 vs 100.14 ms). Nghĩa là **crossover nằm trong khoảng 256-512**; trên lưới đo hiện tại, **L=512 là điểm đầu tiên Hyena vượt Transformer**. Xem [scaling_time.png](scaling_time.png).
 
-→ Bên dưới crossover, Hyena chậm hơn vì overhead FFT trên pure-PyTorch; bên trên, lợi thế `O(L log L)` bắt đầu vượt `O(L²)`.
+-> Điều này hợp với lập luận paper: ở `L` nhỏ overhead FFT vẫn còn, nhưng khi `L` tăng thêm thì lợi thế `O(L log L)` bắt đầu lộ ra.
 
 ---
 
@@ -73,25 +72,25 @@ Tại L=512 Hyena **chậm hơn** (65.6 vs 49.8 ms); tại L=1024 Hyena **nhanh 
 
 | | Paper gốc | Kết quả nhóm |
 |---|---|---|
-| Crossover vs attention | ~L 2048 | ~L 750–1024 |
-| Crossover vs FlashAttention | L 4096–8192 | không đo (không có FlashAttn) |
-| Speedup @ L 64K | ~100× | ngoài tầm (chỉ chạy tới L 2048) |
+| Crossover vs attention | ~L 2048 | giữa L 256-512 |
+| Crossover vs FlashAttention | L 4096-8192 | không đo (không có FlashAttn) |
+| Speedup @ L 64K | ~100x | ngoài tầm (chỉ chạy tới L 2048) |
 
-**Crossover của nhóm sớm hơn paper** — khả năng cao vì: (1) attention trên MPS cũng có overhead, (2) dải `L` nhỏ, (3) FFT pure-PyTorch chưa tối ưu. Đây là quan sát **định tính đúng xu hướng** (Hyena thắng khi `L` lớn), không phải tái hiện số tuyệt đối.
+**Crossover của nhóm sớm hơn paper** — khả năng cao vì: (1) quy mô model nhỏ, (2) dải `L` ngắn, (3) implementation Hyena là pure-PyTorch FFT, (4) baseline attention không phải kernel tối ưu như hệ thống benchmark trong paper. Vì vậy, đây là bằng chứng **định tính đúng xu hướng**, không phải đối chiếu số tuyệt đối 1-1 với paper.
 
 ### Giới hạn cần ghi trên slide
-- **Memory = 0.0 ở mọi L**: [evaluate.py:147](../../../evaluate.py#L147) chỉ đo memory qua `torch.cuda.max_memory_allocated()` → MPS/CPU trả 0. **Phải đo riêng** (ví dụ `torch.mps` hoặc chạy trên CUDA) nếu muốn có cột memory.
-- Pure PyTorch FFT, không CUDA kernel → overhead lớn ở `L` nhỏ.
-- `d_model=256`, ~16M params, `L ≤ 2048` — chưa đủ lớn để thấy speedup bùng nổ kiểu paper.
-- Chạy 1 lần, không lặp seed → không có khoảng tin cậy.
+- **Memory giờ đã đo được** vì CSV mới đến từ CUDA; tuy nhiên Transformer mới có tới `L=1024`, nên chưa có đối sánh memory đầy đủ với Hyena tại `L=2048`.
+- Pure PyTorch FFT, không có custom CUDA kernel -> Hyena vẫn chịu overhead ở `L` nhỏ.
+- `d_model=256`, ~16M params, `L <= 2048` — vẫn là small-scale reproduction.
+- Chạy benchmark quy mô nhỏ, không có lặp nhiều seed/nhiều lần -> không báo cáo khoảng tin cậy.
 
 ---
 
 ## 5. Câu Nói Cho Slide 21/22 (TV2) và Slide 31 (TV3)
 
-> "Ở quy mô nhỏ với FFT thuần PyTorch, Hyena chậm hơn Transformer khi `L` nhỏ do overhead FFT. Nhưng khi `L` tăng, thời gian Hyena chỉ tăng khoảng **2× mỗi lần nhân đôi** — đúng lý thuyết `O(L log L)` — trong khi Attention tăng khoảng **3× và đang tiến lên 4×**. Throughput Hyena gần phẳng (~60k token/s) còn Transformer giảm từ 118k xuống 55k. Điểm giao nhau rơi vào khoảng L≈1K. Đây là minh chứng định tính cho lợi thế long-context của Hyena, đúng xu hướng paper gốc, dù số tuyệt đối chưa so được vì scale nhỏ và thiếu kernel tối ưu."
+> "Trong bộ số đã đồng bộ trên Colab T4, Hyena chỉ chậm hơn Transformer rất nhẹ ở L=256, nhưng đến L=512 đã bắt đầu nhanh hơn. Mỗi lần nhân đôi sequence length, time của Hyena tăng gần 2x, rất sát xu hướng `O(L log L)`, trong khi Transformer tăng nhanh hơn và throughput giảm từ 95.7 xuống 81.8k token/s. Vì vậy, dù đây mới là reproduction quy mô nhỏ và chưa có kernel tối ưu, nhóm vẫn quan sát được xu hướng cốt lõi của paper: khi context dài lên, Hyena scale dễ hơn Attention."
 
 ---
 
 ## 6. Bug Cần Báo Nhóm (lặp lại)
-[evaluate.py:33](../../../evaluate.py#L33) import `get_dataloader` ở top-level → nhánh `--scaling` (không cần data) bị phụ thuộc `datasets`/`transformers`. Đề xuất TV3 chuyển import vào nhánh E1. Chi tiết: [expected_complexity.md §6](expected_complexity.md).
+[evaluate.py:33](../../../evaluate.py#L33) import `get_dataloader` ở top-level -> nhánh `--scaling` (không cần data) bị phụ thuộc `datasets`/`transformers`. Đề xuất TV3 chuyển import vào nhánh E1. Chi tiết: [expected_complexity.md §6](expected_complexity.md).
