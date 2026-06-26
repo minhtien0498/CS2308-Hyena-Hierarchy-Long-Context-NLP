@@ -35,21 +35,24 @@ Attention bị O(L^2)
 | 21 | Complexity và Ý Nghĩa | Quan trọng |
 | 22 | Kết Quả Paper Gốc | Dễ-trung bình |
 
-## File Trong Thư Mục Này
+## Cấu Trúc Thư Mục
 
-| File | Mục đích |
+| Đường dẫn | Mục đích |
 |---|---|
-| `slide_content.md` | Nội dung từng slide 12-22: bullet, hình/bảng cần có, ý chính |
-| `speaker_notes.md` | Lời nói gợi ý cho từng slide |
-| `qna_tv2.md` | Câu hỏi đáp cho phần Hyena method |
-| `visual_checklist.md` | Danh sách hình/bảng nên chuẩn bị |
-| `study_notes.md` | Kiến thức cần học và cách hiểu nhanh |
-| `milestones.md` | Recap, deadline từng milestone, agenda call sync-up |
-| `task_checklist.md` | Checklist toàn bộ việc TV2 cần hoàn thành |
-| `slide_12_22_draft.md` | Bản draft slide 12-22 có thể copy sang deck |
-| `tv2_slides_marp.md` | Bản slide TV2 dạng Markdown/Marp |
-| `source_map.md` | Map nguồn tài liệu trong repo/paper cho từng slide |
-| `handoff_notes.md` | Câu chuyển và phần cần phối hợp với TV1/TV3 |
+| `slides/source/tv2_slides_marp.md` | Bản slide TV2 dạng Markdown/Marp |
+| `slides/source/speaker_notes.md` | Script nói chi tiết theo từng slide |
+| `slides/source/slide_12_22_draft.md` | Bản draft slide 12-22 có thể copy sang deck |
+| `slides/export/tv2_slides_marp.pdf` | Bản PDF export của slide TV2 |
+| `study/qna/qna_tv2.md` | Q&A riêng cho phần Hyena method |
+| `study/qna/qna_shared_contribution.md` | Block Q&A để copy sang file Q&A chung của nhóm |
+| `study/notes/study_notes.md` | Kiến thức cần học và cách hiểu nhanh |
+| `study/notes/source_map.md` | Map nguồn tài liệu trong repo/paper cho từng slide |
+| `presentation_prep/slide_content.md` | Nội dung từng slide 12-22: bullet, hình/bảng cần có, ý chính |
+| `presentation_prep/visual_checklist.md` | Danh sách hình/bảng nên chuẩn bị |
+| `presentation_prep/handoff_notes.md` | Câu chuyển và phần cần phối hợp với TV1/TV3 |
+| `presentation_prep/speaker_notes.md` | Bản notes cũ/dạng ngắn để tham khảo |
+| `planning/milestones.md` | Recap, deadline từng milestone, agenda call sync-up |
+| `planning/task_checklist.md` | Checklist toàn bộ việc TV2 cần hoàn thành |
 
 ## File Nên Đọc Trong Repo
 
@@ -90,3 +93,10 @@ Từ TV1 sang TV2:
 Từ TV2 sang TV3:
 
 > "Các kết quả vừa trình bày là của paper gốc ở quy mô lớn. Trong phạm vi môn học, nhóm thu nhỏ bài toán để kiểm chứng xu hướng trên WikiText-2 với Transformer-small và Hyena-small."
+
+## Gợi Ý Tìm File Nhanh
+
+- Muốn sửa slide chính: vào `slides/source/`
+- Muốn luyện nói và ôn câu hỏi: vào `study/qna/` và `slides/source/speaker_notes.md`
+- Muốn xem tài liệu chuẩn bị cũ hơn: vào `presentation_prep/`
+- Muốn xem bản export: vào `slides/export/`

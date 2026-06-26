@@ -189,7 +189,7 @@ style: |
     font-size: 22px;
   }
 footer: '<span>Nhóm 08 · CS2308</span><span>Hyena Hierarchy (ICML 2023)</span><span>2026</span><span></span>'
-header: '<img src="../../slides/assets/UIT_logo.svg" alt="UIT">'
+header: '<img src="./assets/UIT_logo.svg" alt="UIT">'
 ---
 
 <!-- _class: lead -->
@@ -242,12 +242,11 @@ Mục tiêu: giải thích Hyena hoạt động như thế nào và paper gốc 
 | Chọn lọc theo nội dung input | `O(L²)` time/memory | **Data-controlled gating** |
 | Chất lượng LM mạnh | Khó mở rộng long-context | **FFTConv `O(L log L)`** |
 
-```text
-Kiên: Attention bottleneck  ->  Tiến: Hyena operator  ->  Quang: small reproduction
-```
+<span class="small">Điểm quan trọng: Hyena không tối ưu attention cũ, mà đề xuất một operator attention-free mới.</span>
 
 <!--
 Notes:
+Phân công nói: Kiên -> attention bottleneck; Tiến -> Hyena operator; Quang -> small-scale reproduction.
 Nhấn mạnh Hyena không phải "attention approximation".
 Đây là slide chuyển ý từ phần TV1 sang phần method: vấn đề không chỉ là tốc độ, mà là tìm operator thay thế vẫn đủ expressive cho language modeling.
 -->
@@ -548,6 +547,7 @@ Khi `L` tăng rất lớn, `L log L` tăng chậm hơn `L²`, nên lợi thế c
 </div>
 
 <span class="small">Lưu ý khi nói: Hyena không nhất thiết nhanh hơn ở `L` nhỏ vì FFT có overhead.</span>
+<span class="small">Giá trị của paper: vừa có novelty kiến trúc, vừa thu hẹp quality gap với Transformer ở long-context.</span>
 
 <!--
 Notes:
@@ -607,6 +607,7 @@ L = 64K: L^2 khoảng 4.1B, L log2 L khoảng 1M.
 
 <!--
 Notes:
+Nếu bị hỏi vì sao bài này đáng chú ý: nhấn mạnh novelty không nằm ở việc tối ưu attention cũ, mà ở chỗ paper đề xuất một operator attention-free mới kết hợp long convolution, gating và implicit filter.
 Kết thúc bằng câu chuyển sang TV3: paper chạy scale lớn; nhóm sẽ reproduction nhỏ hơn trên WikiText-2 để kiểm tra xu hướng, không claim đạt lại toàn bộ kết quả paper.
 -->
 
