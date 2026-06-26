@@ -39,6 +39,13 @@ N là số bước lặp convolution + gating. N lớn → operator phong phú h
 ### Q: Paper chứng minh Hyena "tốt hơn" Transformer không?
 Không nói chung chung. Paper cho thấy Hyena **match** Transformer trong một số setting (WikiText-103, The Pile 335M) và **nhanh hơn rõ** ở long-context. Transformer vẫn rất mạnh, được tối ưu tốt.
 
+### Q: Bài báo này có gì mới, và vì sao đáng được đăng?
+Điểm mới quan trọng là Hyena không chỉ tối ưu attention hiện có, mà đề xuất một **operator attention-free mới** cho language modeling. Operator này kết hợp long convolution, data-controlled gating và implicit filter để vừa giữ phụ thuộc xa, vừa có độ phức tạp subquadratic khoảng `O(N · L log L)`.
+
+So với Transformer, Hyena tránh bottleneck ma trận attention `L x L` khi context dài. So với các hướng attention-free trước như S4/H3/GSS, Hyena tổng quát hóa tốt hơn, filter linh hoạt hơn, và thu hẹp quality gap với Transformer mà không cần hybrid với attention.
+
+Nếu trả lời ngắn trước lớp: đây là bài có **novelty về kiến trúc**, **lý do lý thuyết rõ**, và **thực nghiệm đủ mạnh** nên đáng chú ý ở thời điểm ICML 2023.
+
 ### Q: Số liệu nổi bật nhất của paper?
 - WikiText-103: Hyena-3 PPL ~18.6, ngang Transformer 125M.
 - The Pile 335M: Hyena-2 gần Transformer, giảm ~20% **non-parametric** FLOPs.

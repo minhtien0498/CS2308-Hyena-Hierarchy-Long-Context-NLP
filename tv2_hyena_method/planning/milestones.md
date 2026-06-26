@@ -31,10 +31,10 @@ Thông điệp cần giữ:
 | Output | File hỗ trợ | Người phụ trách chính |
 |---|---|---|
 | Nội dung slide 12-22 | `slide_content.md` | TV2 |
-| Lời nói/speaker notes | `speaker_notes.md` | TV2 |
-| Q&A phần Hyena method | `qna_tv2.md` | TV2 |
+| Lời nói/speaker notes | `slides/source/speaker_notes.md` | TV2 |
+| Q&A phần Hyena method | `study/qna/qna_tv2.md` | TV2 |
 | Hình/bảng cần chuẩn bị | `visual_checklist.md` | TV2 |
-| Kiến thức nền cần học | `study_notes.md` | TV2 |
+| Kiến thức nền cần học | `study/notes/study_notes.md` | TV2 |
 | Câu chuyển TV1 -> TV2 và TV2 -> TV3 | `README.md` | TV2 phối hợp TV1/TV3 |
 
 ---
@@ -45,7 +45,7 @@ Mốc dưới đây dùng dạng **T+N ngày**, trong đó **T0 là ngày nhóm 
 
 | Milestone | Deadline tương đối | Nếu T0 = 14/06/2026 | Output cần có | Tiêu chí hoàn thành |
 |---|---:|---:|---|---|
-| M1 - Đọc hiểu phần TV2 | T+2 | 16/06/2026 | Đọc xong `study_notes.md`, `paper_summary.md` Section Method/Experiments | TV2 giải thích miệng được long convolution, gating, implicit filter, FFTConv |
+| M1 - Đọc hiểu phần TV2 | T+2 | 16/06/2026 | Đọc xong `study/notes/study_notes.md`, `paper_summary.md` Section Method/Experiments | TV2 giải thích miệng được long convolution, gating, implicit filter, FFTConv |
 | M2 - Chốt nội dung slide | T+4 | 18/06/2026 | Draft bullet cho slide 12-22 | Mỗi slide có 1 thông điệp chính, không quá 4 bullet |
 | M3 - Chốt visual | T+6 | 20/06/2026 | Hình/bảng cho slide 12-22 | Có đủ sơ đồ Hyena, recurrence, FFTConv, complexity table, paper results table |
 | M4 - Viết speaker notes | T+8 | 22/06/2026 | Notes nói 15 phút | Nói thử không cần nhìn quá nhiều vào slide |
@@ -78,7 +78,7 @@ Thời lượng đề xuất: **45-60 phút**.
 
 TV2 nên chuẩn bị trước:
 
-- [ ] Đã đọc `study_notes.md`.
+- [ ] Đã đọc `study/notes/study_notes.md`.
 - [ ] Đã có bullet cho slide 12-22.
 - [ ] Đã chọn visual cho từng slide theo `visual_checklist.md`.
 - [ ] Đã đọc speaker notes ít nhất 1 lần.
@@ -106,4 +106,3 @@ TV3 cần chuẩn bị:
 | Nói Hyena "tốt hơn Transformer" quá mạnh | Đổi thành: Hyena match Transformer trong một số setting và hiệu quả hơn ở long-context |
 | Lẫn kết quả paper với kết quả nhóm | Slide 22 ghi rõ "Paper gốc"; TV3 mới nói kết quả nhóm |
 | Quá giờ 15 phút | Slide 18 và 20 nói ngắn, tập trung trực giác |
-

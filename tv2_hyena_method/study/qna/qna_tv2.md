@@ -60,3 +60,12 @@ Vì long convolution dùng filter dài bằng toàn bộ sequence, nên về ngu
 
 Vì Hyena không dùng self-attention layer. Nó thay attention bằng Hyena operator gồm convolution và gating.
 
+## 16. Bài báo này có gì mới, và vì sao đáng được đăng?
+
+Điểm mới quan trọng nhất là paper không chỉ tìm cách tối ưu attention cũ, mà đề xuất hẳn một operator attention-free mới cho language modeling. Operator đó kết hợp long convolution, data-controlled gating và implicit filter, nên vừa giữ được khả năng xử lý phụ thuộc xa, vừa có độ phức tạp subquadratic khoảng `O(N · L log L)`.
+
+So với các hướng trước:
+- So với Transformer, Hyena tránh bottleneck ma trận attention `L x L` khi context dài.
+- So với các mô hình attention-free cũ như S4/H3/GSS, Hyena tổng quát hóa tốt hơn, có implicit filter linh hoạt hơn, và thu hẹp quality gap với Transformer mà không cần hybrid với attention.
+
+Vì vậy, giá trị của paper nằm ở chỗ nó có cả **novelty về kiến trúc**, **lập luận lý thuyết hợp lý**, và **thực nghiệm đủ mạnh**: quality gần Transformer trên language modeling và speedup rõ ở long-context. Nếu nói ngắn gọn, đây là một hướng kiến trúc mới đáng chú ý chứ không chỉ là một mẹo tối ưu implementation.
