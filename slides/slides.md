@@ -166,7 +166,7 @@ style: |
     margin:3px 4px 3px 0; font-size:18px;
   }
   .diagram { text-align:center; margin-top:12px; }
-  .diagram img { max-height:280px; width:auto; border-radius:10px; box-shadow:0 4px 16px rgba(15,29,56,.12); }
+  .diagram img { max-height:280px; width:auto; }
   /* khoảng cách dọc giữa các block component (tránh dính nhau) */
   .box, .warn, .pipeline, .grid2, pre, table { margin-top:16px; margin-bottom:16px; }
   .mono { margin:8px 0; }
@@ -1061,21 +1061,57 @@ Nhấn: đây là số chưa hội tụ, chỉ minh họa xu hướng.
 
 ---
 
-## Kết quả: tốc độ theo độ dài chuỗi
+<!-- _class: tight -->
 
-Đo thời gian forward với input giả, cùng cấu hình model 16M tham số, batch 8, trên Colab T4. Tăng dần độ dài L:
+## Kết quả: tốc độ & bộ nhớ theo độ dài chuỗi
 
-| L | Transformer (ms) | Hyena (ms) | Tỉ lệ |
-|---|---|---|---|
-| 256 | 21.4 | 21.9 | Hyena chậm hơn chút |
-| 512 | 43.7 | 42.4 | hai bên hòa nhau |
-| 1024 | 100.1 | 84.1 | Hyena nhanh hơn ~1.19 lần |
+Đo forward với input giả, cùng cấu hình ~16M tham số, batch 8, trên Colab T4:
 
-Ở L=2048 Hyena vẫn chạy tốt (khoảng 168 ms) trong khi Transformer bắt đầu đuối. Attention tăng theo **bình phương** độ dài, còn Hyena tăng **gần tuyến tính**, nên chuỗi càng dài Hyena càng lợi.
+| L | TF (ms) | Hyena (ms) | TF (MB) | Hyena (MB) |
+|---|---|---|---|---|
+| 256 | 21.4 | 21.9 | 466 | 467 |
+| 512 | 43.7 | 42.4 | 863 | 862 |
+| 1024 | 100.1 | 84.1 | 1655 | 1651 |
+| 2048 | — *(không đo)* | 167.8 | — | 3232 |
+
+- **Tốc độ:** crossover quanh `L≈512`; Hyena vượt rõ từ `L=1024` (~1.19×). Attention tăng ~bình phương, Hyena ~tuyến tính.
+- **Bộ nhớ:** ở `L` nhỏ gần bằng nhau (tham số ~16M chiếm phần lớn) — khác biệt $O(L^2)$ của attention chỉ lộ rõ ở `L` rất lớn. Nhóm chỉ đo Transformer tới `L=1024`, Hyena chạy được tới `L=2048`.
 
 <!--
 Notes:
 Trả lời câu hỏi 2: crossover quanh L=512, Hyena vượt rõ từ L=1024 — đúng xu hướng paper.
+-->
+
+---
+
+## Biểu đồ kết quả reproduction
+
+<div class="grid2">
+<div class="center">
+
+![w:430px](../results/plots/E1_ppl.png)
+
+<span class="small">E1 — Perplexity theo epoch (WikiText-2, L=256)</span>
+
+</div>
+<div class="center">
+
+![w:430px](../results/plots/reproduce_runtime.png)
+
+<span class="small">Runtime forward theo độ dài chuỗi L</span>
+
+</div>
+</div>
+
+<div class="box">
+
+Hyena hội tụ **nhanh hơn** Transformer ở E1 (PPL thấp hơn ở mỗi epoch); runtime Hyena tăng **gần tuyến tính** và vượt Transformer rõ từ `L≈1024`.
+
+</div>
+
+<!--
+Notes:
+Chart > bảng số: cho khán giả thấy ngay xu hướng. Nhắc lại đây là số của nhóm (WikiText-2, 5 epoch chưa hội tụ), không phải số paper.
 -->
 
 ---
