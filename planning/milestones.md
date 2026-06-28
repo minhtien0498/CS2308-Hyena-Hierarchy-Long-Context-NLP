@@ -30,10 +30,10 @@ Thông điệp cần giữ:
 
 | Output | File hỗ trợ | Người phụ trách chính |
 |---|---|---|
-| Nội dung slide 12-22 | `slide_content.md` | TV2 |
-| Lời nói/speaker notes | `slides/source/speaker_notes.md` | TV2 |
+| Nội dung slide 12-22 | `slides/presentation_prep/slide_content.md` | TV2 |
+| Lời nói/speaker notes | `slides/tien_slide.md` | TV2 |
 | Q&A phần Hyena method | `study/qna/qna_tv2.md` | TV2 |
-| Hình/bảng cần chuẩn bị | `visual_checklist.md` | TV2 |
+| Hình/bảng cần chuẩn bị | `slides/presentation_prep/visual_checklist.md` | TV2 |
 | Kiến thức nền cần học | `study/notes/study_notes.md` | TV2 |
 | Câu chuyển TV1 -> TV2 và TV2 -> TV3 | `README.md` | TV2 phối hợp TV1/TV3 |
 
@@ -80,7 +80,7 @@ TV2 nên chuẩn bị trước:
 
 - [ ] Đã đọc `study/notes/study_notes.md`.
 - [ ] Đã có bullet cho slide 12-22.
-- [ ] Đã chọn visual cho từng slide theo `visual_checklist.md`.
+- [ ] Đã chọn visual cho từng slide theo `slides/presentation_prep/visual_checklist.md`.
 - [ ] Đã đọc speaker notes ít nhất 1 lần.
 - [ ] Đã chuẩn bị 5 câu Q&A quan trọng nhất.
 - [ ] Đã ghi rõ slide 22 là **kết quả paper gốc**, không phải kết quả nhóm.

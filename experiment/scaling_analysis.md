@@ -1,6 +1,6 @@
 # TV2 - Scaling Analysis (E2/E3, đồng bộ với `results/`)
 
-> Phục vụ yêu cầu [phan_cong_present_hyena_3_tuan.md §8.3](../../phan_cong_present_hyena_3_tuan.md):
+> Phục vụ yêu cầu [phan_cong_present_hyena_3_tuan.md §8.3](../docs/phan_cong_present_hyena_3_tuan.md):
 > *"CSV scaling E2/E3: TV3 tạo + TV2 phân tích scaling runtime/memory và liên hệ complexity."*
 >
 > **Lưu ý phụ trách:** TV2 từng dùng bộ số tạm thời để viết khung phân tích. File này đã được **đồng bộ lại theo CSV chính thức trong `results/`** để TV2 và TV3 cùng dùng một bộ số.
@@ -17,7 +17,7 @@
 | Đo | warmup 5 + measure 20 forward pass, dummy input |
 | Tham số | Transformer 16.28M / Hyena 16.45M (chênh ~1%, so sánh công bằng) |
 | File | [E2_transformer_scale.csv](E2_transformer_scale.csv), [E3_hyena_scale.csv](E3_hyena_scale.csv) |
-| Nguồn số | đồng bộ từ [results/](../../results/) |
+| Nguồn số | đồng bộ từ [results/](../results/) |
 
 ---
 
@@ -93,4 +93,4 @@ Tại L=256 Hyena **hơi chậm hơn** (21.85 vs 21.41 ms), nhưng tới L=512 H
 ---
 
 ## 6. Bug Cần Báo Nhóm (lặp lại)
-[evaluate.py:33](../../../evaluate.py#L33) import `get_dataloader` ở top-level -> nhánh `--scaling` (không cần data) bị phụ thuộc `datasets`/`transformers`. Đề xuất TV3 chuyển import vào nhánh E1. Chi tiết: [expected_complexity.md §6](expected_complexity.md).
+[evaluate.py:33](../evaluate.py#L33) import `get_dataloader` ở top-level -> nhánh `--scaling` (không cần data) bị phụ thuộc `datasets`/`transformers`. Đề xuất TV3 chuyển import vào nhánh E1. Chi tiết: [expected_complexity.md §6](expected_complexity.md).

@@ -1,6 +1,6 @@
 # TV2 - Block Q&A Cho File Q&A Chung
 
-> Phục vụ yêu cầu [phan_cong_present_hyena_3_tuan.md §6](../../phan_cong_present_hyena_3_tuan.md):
+> Phục vụ yêu cầu [phan_cong_present_hyena_3_tuan.md §6](../../docs/phan_cong_present_hyena_3_tuan.md):
 > *"File Q&A chung: Cả nhóm cùng cập nhật. Bước 2: TV2 điền phần Q&A Hyena method và paper results vào file chung."*
 
 Cách dùng: copy block dưới đây vào file Q&A chung của nhóm (chưa tồn tại — cả nhóm chốt format), dán vào mục **TV2 — Hyena method & paper results**. Đây là bản đã chắt từ [qna_tv2.md](qna_tv2.md), giữ các câu sát nhất với phần TV2 trình bày, không trùng TV1/TV3.
@@ -24,10 +24,10 @@ Convolution thường dùng filter khá tĩnh, không đổi theo nội dung inp
 Thay vì học trực tiếp vector filter dài L (tham số tăng theo L), Hyena học hàm `h_t = Window(t)·FFN(PositionalEncoding(t))`. Số tham số nằm trong FFN, ~O(1) theo L → filter dài tùy ý mà tham số không nổ.
 
 ### Q: Vì sao FFTConv đạt O(L log L)?
-Theo convolution theorem: convolution trong miền thời gian = nhân element-wise trong miền tần số. Lấy FFT(h), FFT(u), nhân, rồi iFFT. Chi phí FFT là O(L log L). Trong repo: [models/hyena.py `_causal_fft_conv`](../../../models/hyena.py#L194).
+Theo convolution theorem: convolution trong miền thời gian = nhân element-wise trong miền tần số. Lấy FFT(h), FFT(u), nhân, rồi iFFT. Chi phí FFT là O(L log L). Trong repo: [models/hyena.py `_causal_fft_conv`](../../models/hyena.py#L194).
 
 ### Q: "Causal" trong Hyena đạt bằng cách nào, mà không cần mask như Transformer?
-Zero-pad 2L rồi lấy L phần tử đầu ([hyena.py:212](../../../models/hyena.py#L212)) → convolution tuyến tính (aperiodic) → token tại t chỉ thấy t' ≤ t. Tương đương Proposition 3.1 (Causal Hyenas) trong paper: nếu mọi filter hⁿ causal thì toàn operator causal.
+Zero-pad 2L rồi lấy L phần tử đầu ([hyena.py:212](../../models/hyena.py#L212)) → convolution tuyến tính (aperiodic) → token tại t chỉ thấy t' ≤ t. Tương đương Proposition 3.1 (Causal Hyenas) trong paper: nếu mọi filter hⁿ causal thì toàn operator causal.
 
 ### Q: Order-N hierarchy nghĩa là gì? Liên hệ H3/GSS?
 N là số bước lặp convolution + gating. N lớn → operator phong phú hơn. Paper chỉ ra H3 ≈ Hyena₂, GSS ≈ Hyena₁; Hyena tổng quát lên bậc N + filter free-form. Nhóm dùng order=2.
@@ -59,4 +59,4 @@ Không. TV2 chỉ trình bày kết quả Poli et al. Kết quả reproduction n
 Cần kernel FFTConv tối ưu để đạt lý thuyết; pure PyTorch có overhead ở sequence ngắn; hội tụ nhạy hyperparameter ở scale nhỏ. → Đây cũng là lý do kết quả nhóm có thể chưa thấy rõ lợi thế PPL.
 
 ### Q: Vì sao có thể Hyena chậm hơn ở kết quả reproduction?
-Sequence length chưa đủ lớn, pure PyTorch FFT chưa tối ưu, overhead FFT lớn ở ~16M params. Lợi thế runtime rõ nhất ở `L` lớn + kernel tối ưu. Xem [experiment/scaling_analysis.md](../experiment/scaling_analysis.md).
+Sequence length chưa đủ lớn, pure PyTorch FFT chưa tối ưu, overhead FFT lớn ở ~16M params. Lợi thế runtime rõ nhất ở `L` lớn + kernel tối ưu. Xem [experiment/scaling_analysis.md](../../experiment/scaling_analysis.md).

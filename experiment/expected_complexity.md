@@ -1,6 +1,6 @@
 # TV2 - Complexity Kỳ Vọng (lý thuyết, trước khi chạy số)
 
-> Phục vụ yêu cầu [phan_cong_present_hyena_3_tuan.md §8.2](../../phan_cong_present_hyena_3_tuan.md): bảng complexity kỳ vọng để đối chiếu với kết quả scaling (E2/E3).
+> Phục vụ yêu cầu [phan_cong_present_hyena_3_tuan.md §8.2](../docs/phan_cong_present_hyena_3_tuan.md): bảng complexity kỳ vọng để đối chiếu với kết quả scaling (E2/E3).
 
 ---
 
@@ -51,7 +51,7 @@ Bậc tính (đơn vị tương đối, lấy log₂):
 | Pure PyTorch FFT (không CUDA kernel) | overhead FFT lớn | làm Hyena chậm hơn kỳ vọng ở `L` nhỏ/trung |
 | Thư viện FFT tối ưu chung | chưa tinh chỉnh cho d_model=256 | tăng overhead cố định |
 | MPS / CPU thay vì GPU | khác throughput & memory pool | sai khác tuyệt đối |
-| Memory đo được chỉ khi có CUDA | `peak_mem_mb` trả 0 trên MPS/CPU ([evaluate.py:147](../../../evaluate.py#L147)) | cột memory có thể trống → đo riêng |
+| Memory đo được chỉ khi có CUDA | `peak_mem_mb` trả 0 trên MPS/CPU ([evaluate.py:147](../evaluate.py#L147)) | cột memory có thể trống → đo riêng |
 | Batch size cố định | che mờ chi phí theo `L` | giữ batch_size=8 đều cho 2 model |
 
 ---
@@ -71,7 +71,7 @@ Trước khi xem số, kỳ vọng hợp lý cho reproduction nhóm:
 
 ## 6. Bug Cần Báo Nhóm
 
-[evaluate.py:33](../../../evaluate.py#L33) import `from data.preprocess import get_dataloader` ở **top-level**, kéo theo `datasets` + `transformers` dù nhánh `--scaling` (chỉ dùng dummy input) không cần data.
+[evaluate.py:33](../evaluate.py#L33) import `from data.preprocess import get_dataloader` ở **top-level**, kéo theo `datasets` + `transformers` dù nhánh `--scaling` (chỉ dùng dummy input) không cần data.
 
 → Hệ quả: chạy `python evaluate.py --scaling` trên môi trường thiếu `datasets`/`transformers` sẽ **crash ngay lúc import**, dù logic scaling không đụng tới data.
 

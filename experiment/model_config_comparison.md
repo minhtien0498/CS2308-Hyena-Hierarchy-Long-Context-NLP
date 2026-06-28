@@ -1,6 +1,6 @@
 # TV2 - Bảng So Sánh Cấu Hình Transformer-small vs Hyena-small
 
-> Phục vụ yêu cầu [phan_cong_present_hyena_3_tuan.md §8.2](../../phan_cong_present_hyena_3_tuan.md):
+> Phục vụ yêu cầu [phan_cong_present_hyena_3_tuan.md §8.2](../docs/phan_cong_present_hyena_3_tuan.md):
 > *"Output cần nộp: Bảng cấu hình Transformer-small vs Hyena-small; đảm bảo so sánh công bằng."*
 
 Mục đích: chứng minh hai model reproduction **so sánh công bằng** — cùng quy mô, chỉ khác cơ chế trộn sequence (attention vs Hyena operator).
@@ -9,7 +9,7 @@ Mục đích: chứng minh hai model reproduction **so sánh công bằng** — 
 
 ## 1. Bảng Cấu Hình
 
-Nguồn số liệu: [models/transformer.py](../../../models/transformer.py), [models/hyena.py](../../../models/hyena.py), [evaluate.py](../../../evaluate.py) (`build_model_fresh`).
+Nguồn số liệu: [models/transformer.py](../models/transformer.py), [models/hyena.py](../models/hyena.py), [evaluate.py](../evaluate.py) (`build_model_fresh`).
 
 | Tham số | Transformer-small | Hyena-small | Giống/khác |
 |---|---|---|---|
@@ -27,7 +27,7 @@ Nguồn số liệu: [models/transformer.py](../../../models/transformer.py), [m
 | Block | Pre-LN + mix + Pre-LN + FFN + residual | giống, thay MHA bằng HyenaOperator | ✅ giống khung |
 | LM head | Linear + weight tying | Linear + weight tying | ✅ giống |
 
-> Khung block **giống hệt** ([transformer.py TransformerBlock](../../../models/transformer.py), [hyena.py HyenaBlock](../../../models/hyena.py#L270)): cùng Pre-LN, cùng FFN GELU, cùng residual. Khác duy nhất: lớp trộn sequence (MHA ↔ HyenaOperator). Đây là điều kiện cần để kết luận PPL/scaling chênh lệch là do **cơ chế**, không do quy mô.
+> Khung block **giống hệt** ([transformer.py TransformerBlock](../models/transformer.py), [hyena.py HyenaBlock](../models/hyena.py#L270)): cùng Pre-LN, cùng FFN GELU, cùng residual. Khác duy nhất: lớp trộn sequence (MHA ↔ HyenaOperator). Đây là điều kiện cần để kết luận PPL/scaling chênh lệch là do **cơ chế**, không do quy mô.
 
 ---
 

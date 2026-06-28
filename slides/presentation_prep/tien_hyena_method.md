@@ -1,10 +1,10 @@
-# TV2 - Gói Chuẩn Bị Phần Hyena Method & Paper Results
+# Tiến - Gói Chuẩn Bị Phần Hyena Method & Paper Results
 
-Phần này dành cho người phụ trách **TV2**, tương ứng **slide 12-22** trong plan 45 phút.
+Phần này dành cho **Tiến**, tương ứng **slide 12-22** trong plan 45 phút.
 
-## Mục Tiêu Của TV2
+## Mục Tiêu Của Tiến
 
-TV2 cần trả lời được câu hỏi:
+Tiến cần trả lời được câu hỏi:
 
 > Hyena thay thế Self-Attention bằng cơ chế nào, vì sao cơ chế đó có độ phức tạp thấp hơn, và bài báo gốc chứng minh hiệu quả ra sao?
 
@@ -19,7 +19,7 @@ Attention bị O(L^2)
 -> Paper cho thấy Hyena match Transformer ở một số benchmark và nhanh hơn ở long-context
 ```
 
-## Slide TV2 Phụ Trách
+## Slide Tiến Phụ Trách
 
 | Slide | Tiêu đề | Mức độ |
 |---:|---|---|
@@ -29,7 +29,7 @@ Attention bị O(L^2)
 | 15 | Data-Controlled Gating | Trung bình |
 | 16 | Hyena Recurrence | Quan trọng |
 | 17 | Order-N Hierarchy | Trung bình |
-| 18 | Matrix View | Khó nhất trong phần TV2 |
+| 18 | Matrix View | Khó nhất trong phần của Tiến |
 | 19 | Implicit Filter | Quan trọng |
 | 20 | FFTConv | Quan trọng |
 | 21 | Complexity và Ý Nghĩa | Quan trọng |
@@ -39,20 +39,17 @@ Attention bị O(L^2)
 
 | Đường dẫn | Mục đích |
 |---|---|
-| `slides/source/tv2_slides_marp.md` | Bản slide TV2 dạng Markdown/Marp |
-| `slides/source/speaker_notes.md` | Script nói chi tiết theo từng slide |
-| `slides/source/slide_12_22_draft.md` | Bản draft slide 12-22 có thể copy sang deck |
-| `slides/export/tv2_slides_marp.pdf` | Bản PDF export của slide TV2 |
+| `slides/tien_slide.md` | Bản slide hiện tại của Tiến trong deck chung |
 | `study/qna/qna_tv2.md` | Q&A riêng cho phần Hyena method |
 | `study/qna/qna_shared_contribution.md` | Block Q&A để copy sang file Q&A chung của nhóm |
 | `study/notes/study_notes.md` | Kiến thức cần học và cách hiểu nhanh |
 | `study/notes/source_map.md` | Map nguồn tài liệu trong repo/paper cho từng slide |
-| `presentation_prep/slide_content.md` | Nội dung từng slide 12-22: bullet, hình/bảng cần có, ý chính |
-| `presentation_prep/visual_checklist.md` | Danh sách hình/bảng nên chuẩn bị |
-| `presentation_prep/handoff_notes.md` | Câu chuyển và phần cần phối hợp với TV1/TV3 |
-| `presentation_prep/speaker_notes.md` | Bản notes cũ/dạng ngắn để tham khảo |
+| `slides/presentation_prep/slide_content.md` | Nội dung từng slide 12-22: bullet, hình/bảng cần có, ý chính |
+| `slides/presentation_prep/visual_checklist.md` | Danh sách hình/bảng nên chuẩn bị |
+| `slides/presentation_prep/handoff_notes.md` | Câu chuyển và phần cần phối hợp với TV1/TV3 |
+| `slides/presentation_prep/speaker_notes.md` | Bản notes cũ/dạng ngắn để tham khảo |
 | `planning/milestones.md` | Recap, deadline từng milestone, agenda call sync-up |
-| `planning/task_checklist.md` | Checklist toàn bộ việc TV2 cần hoàn thành |
+| `planning/task_checklist.md` | Checklist toàn bộ việc Tiến cần hoàn thành |
 
 ## File Nên Đọc Trong Repo
 
@@ -82,21 +79,20 @@ Attention bị O(L^2)
    Convolution dài tính qua FFT có chi phí `O(L log L)` thay vì tính trực tiếp tốn hơn.
 
 6. **Kết quả paper gốc phải tách khỏi kết quả nhóm.**  
-   TV2 chỉ trình bày kết quả của Poli et al.; kết quả nhóm nằm ở phần TV3.
+   Tiến chỉ trình bày kết quả của Poli et al.; kết quả nhóm nằm ở phần TV3.
 
 ## Câu Chuyển Tiếp
 
-Từ TV1 sang TV2:
+Từ TV1 sang Tiến:
 
 > "Sau khi thấy Attention có ba tính chất mạnh nhưng bị giới hạn bởi chi phí `O(L^2)`, phần tiếp theo sẽ trình bày Hyena: một toán tử không dùng attention nhưng cố gắng giữ lại các tính chất quan trọng đó bằng long convolution và gating."
 
-Từ TV2 sang TV3:
+Từ Tiến sang TV3:
 
 > "Các kết quả vừa trình bày là của paper gốc ở quy mô lớn. Trong phạm vi môn học, nhóm thu nhỏ bài toán để kiểm chứng xu hướng trên WikiText-2 với Transformer-small và Hyena-small."
 
 ## Gợi Ý Tìm File Nhanh
 
-- Muốn sửa slide chính: vào `slides/source/`
-- Muốn luyện nói và ôn câu hỏi: vào `study/qna/` và `slides/source/speaker_notes.md`
-- Muốn xem tài liệu chuẩn bị cũ hơn: vào `presentation_prep/`
-- Muốn xem bản export: vào `slides/export/`
+- Muốn sửa phần slide hiện tại của Tiến: vào `slides/tien_slide.md`
+- Muốn luyện nói và ôn câu hỏi: vào `study/qna/`
+- Muốn xem tài liệu chuẩn bị cũ hơn: vào `slides/presentation_prep/`
