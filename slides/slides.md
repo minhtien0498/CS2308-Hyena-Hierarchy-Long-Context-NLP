@@ -599,8 +599,8 @@ Không đi sâu toán. Khán giả thấy "dòng chảy" tiến hóa và vị tr
 | Attention làm tốt | Vấn đề khi `L` dài | Hyena thay bằng |
 |---|---|---|
 | Trộn thông tin toàn chuỗi | Ma trận `L × L` | **Long convolution** |
-| Chọn lọc theo nội dung input | `O(L²)` time/memory | **Data-controlled gating** |
-| Chất lượng LM mạnh | Khó mở rộng long-context | **FFTConv `O(L log L)`** |
+| Trọng số phụ thuộc nội dung | So sánh mọi cặp token | **Data-controlled gating** |
+| Tính toán trên context dài | `O(L²)` time/memory | **FFTConv `O(L log L)`** |
 
 <span class="small">Điểm quan trọng: Hyena không tối ưu attention cũ, mà đề xuất một operator attention-free mới.</span>
 
@@ -643,9 +643,9 @@ Slide chuyển ý từ phần TV1 sang phần method: vấn đề không chỉ l
 
 <div class="pipeline">
 Input u<br>
- -> linear projections: x1, x2, ..., v<br>
+ -> projections: gates x1...xN, value v<br>
  -> z1 = v<br>
- -> repeat: z(n+1) = gate xn * Conv(hn, zn)<br>
+ -> repeat n=1..N: z(n+1) = x(n) * Conv(h(n), z(n))<br>
  -> output y
 </div>
 
@@ -662,10 +662,21 @@ Slide bản đồ. Các slide sau sẽ bóc từng mảnh: long conv, gating, re
 
 ### Từ local kernel sang full-context filter
 
-| Mô hình | Kernel/filter | Phạm vi nhìn |
-|---|---|---|
-| CNN thường | Ngắn, local | Vài token lân cận |
-| Hyena | Dài bằng sequence | Toàn bộ context |
+<div class="grid2">
+
+<div class="box">
+<strong>CNN thường</strong><br>
+Kernel ngắn, local<br>
+Nhìn vài token lân cận
+</div>
+
+<div class="box">
+<strong>Hyena</strong><br>
+Filter dài bằng sequence<br>
+Nhận tín hiệu từ rất xa phía trước
+</div>
+
+</div>
 
 $$
 (h * u)_t = \sum_{i=0}^{t} h_{t-i}u_i
@@ -673,10 +684,10 @@ $$
 
 ```text
 CNN local:   token t chỉ nhận từ vùng gần     [x x x] ---- t
-Long conv:   token t có thể nhận từ rất xa    [x x x x x x x x x] t
+Long conv:   token t có thể nhận từ rất xa phía trước    [x x x x x x x x x] t
 ```
 
-**Ý nghĩa:** long convolution giúp mô hình hóa phụ thuộc xa mà không cần ma trận attention `L × L`.
+**Ý nghĩa:** long convolution giúp mô hình hóa phụ thuộc xa mà không cần ma trận attention `L x L`.
 
 <!--
 Notes:
@@ -878,15 +889,26 @@ Notes:
 </div>
 
 <div class="pipeline">
-1. FFT(h) và FFT(u)<br>
+1. FFT(filter) và FFT(signal)<br>
 2. Nhân element-wise trong miền tần số<br>
 3. iFFT để quay lại sequence output
 </div>
 
-| Cách tính | Chi phí trực giác | Khi nào quan trọng |
-|---|---|---|
-| Direct convolution | tốn hơn khi filter rất dài | ít hợp với long-context |
-| FFTConv | khoảng `O(L log L)` | lợi khi `L` lớn |
+<div class="grid2">
+
+<div class="box">
+<strong>Direct convolution</strong><br>
+Chi phí tăng nhanh khi filter rất dài<br>
+Ít phù hợp với long-context
+</div>
+
+<div class="box">
+<strong>FFTConv</strong><br>
+Chi phí khoảng <code>O(L log L)</code><br>
+Có lợi khi <code>L</code> lớn
+</div>
+
+</div>
 
 <span class="small">Trong repo: `models/hyena.py -> HyenaOperator._causal_fft_conv`.</span>
 
@@ -913,6 +935,8 @@ y = torch.fft.irfft(Y, n=fft_len, dim=-1)[..., :L]
 | Standard Attention | `O(L²)` | `O(L²)` |
 | FlashAttention | `O(L²)` compute | tối ưu memory access |
 | Hyena | `O(N · L log L)` | gần tuyến tính theo `L` |
+
+<span class="small">Trong Hyena, `N` là order/số bước recurrence, thường được chọn nhỏ.</span>
 
 <div class="box">
 
@@ -947,7 +971,7 @@ Minh họa số: L=1K: L^2≈1M, LlogL≈10K. L=8K: L^2≈67M, LlogL≈106K. L=6
   <tbody>
     <tr><td>WikiText-103</td><td>Hyena-3 ~ Transformer 125M</td></tr>
     <tr><td>The Pile 335M</td><td>Hyena-2 gần Transformer</td></tr>
-    <tr><td>Synthetic tasks</td><td>tốt trên recall/reasoning dài</td></tr>
+    <tr><td>Associative recall</td><td>giữ chất lượng ở 30K–131K, nhiều baseline OOM</td></tr>
   </tbody>
 </table>
 
@@ -972,7 +996,7 @@ Minh họa số: L=1K: L^2≈1M, LlogL≈10K. L=8K: L^2≈67M, LlogL≈106K. L=6
 
 <div class="box">
 
-Đây là kết quả của **paper gốc**, không phải kết quả reproduction của nhóm.
+Kết quả chính của paper: **Hyena thu hẹp khoảng cách chất lượng với Transformer, đồng thời thể hiện lợi thế rõ ở các bài toán context rất dài**.
 
 </div>
 
