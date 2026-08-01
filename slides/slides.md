@@ -53,7 +53,7 @@ style: |
   }
   ol { padding-left: 22px; } ol li { margin: 11px 0; line-height: 1.45; }
   table { font-size: 21px; border-collapse: collapse; margin: 10px 0; width: 100%;
-    box-shadow: 0 2px 10px rgba(15,29,56,.07); border-radius: 10px; overflow: hidden; }
+    border-radius: 10px; overflow: hidden; }
   thead th { background: var(--navy); color: #fff; font-weight: 600; }
   tbody tr:nth-child(even) td { background: #f6f9fe; }
   td, th { border: 1px solid var(--line); padding: 8px 14px; }
@@ -67,13 +67,12 @@ style: |
     background: linear-gradient(180deg, #f7faff 0%, #eef3fb 100%);
     border: 1px solid var(--line); border-left: 5px solid var(--navy);
     border-radius: 12px; padding: 16px 22px; margin: 14px 0;
-    box-shadow: 0 2px 12px rgba(15,29,56,.07);
   }
   .katex { font-size: 1.18em; }
   /* ── Code as a clean light card ── */
   pre {
     background: #f7faff; border: 1px solid var(--line);
-    border-radius: 12px; padding: 14px 18px; box-shadow: 0 2px 12px rgba(15,29,56,.06);
+    border-radius: 12px; padding: 14px 18px;
   }
   pre code { background: none; color: #20324f; font-size: 19px; line-height: 1.6; }
   footer {
@@ -120,7 +119,7 @@ style: |
   .small { font-size:18px; color:var(--muted); }
   .box {
     background:#f7faff; border:1px solid var(--line); border-left:5px solid var(--accent);
-    border-radius:0 12px 12px 0; padding:13px 22px; box-shadow:0 2px 12px rgba(15,29,56,.06);
+    border-radius:0 12px 12px 0; padding:13px 22px;
   }
   .warn {
     background:#fff8ec; border:1px solid #f3dca6; border-left:5px solid #e0a51e;
@@ -135,7 +134,6 @@ style: |
   .flow .step {
     background:#fff; border:1.5px solid #cdd9ec; border-radius:10px;
     padding:9px 22px; font-weight:600; color:var(--navy); font-size:21px;
-    box-shadow:0 2px 8px rgba(15,29,56,.06);
   }
   .flow .step.fill { background:var(--navy); color:#fff; border-color:var(--navy); }
   .flow .ar { color:var(--accent); font-size:17px; line-height:1; }
@@ -149,14 +147,14 @@ style: |
   .mono {
     background:#0f1f3d; color:#dbe7ff; border-radius:12px; padding:16px 22px;
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    font-size:19px; line-height:1.55; box-shadow:0 4px 16px rgba(15,29,56,.22);
+    font-size:19px; line-height:1.55;
     display:inline-block;
   }
   .mono .dim { color:#7f93bd; }
   /* monospace pipeline / step card (Tiến) */
   .pipeline {
     background:#f7faff; border:1px solid var(--line); border-radius:12px;
-    padding:12px 16px; box-shadow:0 2px 12px rgba(15,29,56,.06);
+    padding:12px 16px;
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     font-size:20px; line-height:1.65; color:#20324f;
   }
@@ -1021,6 +1019,17 @@ Kết thúc bằng câu chuyển sang TV3 (Quang): paper chạy scale lớn; nh�
 
 <div class="dmeta">Phần 7</div>
 
+<!--
+Notes — Quang (0:45)
+
+• Cảm ơn Tiến. Đến đây mọi người đã thấy Hyena hoạt động thế nào và paper báo cáo được những gì ở quy mô lớn.
+
+• Phần cuối là phần của nhóm em: chúng em tự cài lại Hyena, tự train, và tự đo, để xem những điều paper nói có thật sự xảy ra ở quy mô nhỏ hay không.
+
+• Em sẽ đi qua năm ý: phạm vi của việc tái hiện, cấu hình thực nghiệm, kết quả về chất lượng, kết quả về tốc độ, và cuối cùng là những giới hạn mà nhóm xin nói thẳng.
+
+→ Chuyển: "Trước hết là phạm vi."
+-->
 
 ---
 
@@ -1039,8 +1048,19 @@ Hai câu hỏi nhóm muốn tự trả lời:
 Code do nhóm tự cài bằng thuần PyTorch, có đối chiếu với bản chính chủ `HazyResearch/safari`.
 
 <!--
-Notes:
-Nói rõ giới hạn tài nguyên ngay từ đầu để không bị hiểu nhầm là claim đạt lại paper.
+Notes — Quang (1:45)
+
+• Nhóm em không tái hiện toàn bộ paper. Paper gốc train trên The Pile, tức là khoảng tám trăm gi-ga-bai văn bản, và cần cụm GPU rất lớn, vượt xa tài nguyên của một đồ án môn học.
+
+• Vì vậy nhóm chọn làm ở quy mô nhỏ. Và em xin nói rõ ngay từ đầu: mục tiêu không phải khớp con số tuyệt đối của paper, mà là kiểm chứng xu hướng.
+
+• Cụ thể, nhóm đặt ra hai câu hỏi để tự trả lời. Thứ nhất, ở quy mô nhỏ thì chất lượng của Hyena, đo bằng perplexity, có ngang Transformer không.
+
+• Thứ hai, khi chuỗi dài ra thì Hyena có lợi thế tốc độ như paper dự đoán không.
+
+• Một điểm em muốn nhấn mạnh: toàn bộ code là do nhóm tự cài bằng thuần PyTorch, và nhóm có đối chiếu từng phần với bản cài chính chủ của nhóm tác giả để chắc chắn mình cài đúng.
+
+→ Chuyển: "Đây là cấu hình cụ thể."
 -->
 
 ---
@@ -1060,27 +1080,131 @@ Hyena dùng `torch.fft.rfft` thuần PyTorch, không có custom CUDA kernel.
 Huấn luyện bằng AdamW kèm warmup rồi cosine, đánh giá bằng val loss quy ra perplexity, chạy trên Colab T4.
 
 <!--
-Notes:
-Hai model cùng cỡ tham số (~16M) để so sánh công bằng. Khác biệt duy nhất là lớp trộn thông tin.
+Notes — Quang (2:00)
+
+• Dữ liệu là WikiText-2, một tập văn bản Wikipedia chuẩn dùng để đánh giá mô hình ngôn ngữ. Nhóm dùng tokenizer của GPT-2 và cắt văn bản thành các đoạn dài 256 token.
+
+• Để so sánh cho công bằng, nhóm dựng hai model cùng cỡ: cả hai đều bốn lớp, cùng số chiều ẩn là 256, cùng kích thước feed-forward là 1024.
+
+• Chỉ khác nhau đúng một chỗ, là lớp trộn thông tin: Transformer dùng bốn đầu attention, còn Hyena dùng toán tử bậc hai với tích chập tính qua FFT.
+
+• Số tham số gần như bằng nhau, mười sáu phẩy một triệu so với mười sáu phẩy ba triệu (16.1M vs 16.3M). Nên nếu một bên tốt hơn thì chắc chắn không phải vì nó to hơn.
+
+• Hyena ở đây là bản thuần PyTorch, dùng hàm FFT có sẵn của thư viện, không có CUDA kernel viết riêng như paper.
+
+• Cả hai model được train bằng AdamW, có warm-up rồi giảm dần theo cosine, đánh giá bằng val loss quy ra perplexity, và chạy trên GPU T4 miễn phí của Colab.
+
+→ Chuyển: "Trước khi xem kết quả, em xin nói qua nhóm đã cài đặt như thế nào."
+-->
+
+---
+
+<!-- _class: tight -->
+
+## Nhóm cài đặt như thế nào
+
+<div class="grid2">
+<div>
+
+**Công thức paper** (Tiến vừa trình bày):
+
+$$
+z^{n+1}_t = x^n_t \cdot (h^n * z^n)_t
+$$
+
+**Vòng lặp trong code của nhóm:**
+
+```python
+for n in range(self.order):
+    h_n  = h_all[n]
+    x_n  = gate_tensors[n]
+    conv = causal_fft_conv(h_n, z)
+    z    = x_n * conv
+```
+
+</div>
+<div>
+
+**Đối chiếu với bản chính chủ** `HazyResearch/safari`:
+
+| Thành phần lõi | Bản nhóm |
+|---|---|
+| FFTConv đệm `2L` → cắt `L` đầu | <span class="yes">khớp</span> |
+| Short conv depthwise | <span class="yes">khớp</span> |
+| Số projection `= N+1` | <span class="yes">khớp</span> |
+| Gating đệ quy bậc `N` | <span class="yes">khớp</span> |
+| Activation của filter | <span class="no">SiLU (gốc: sin)</span> |
+| Modulation · skip-conn | <span class="no">rút gọn · bỏ</span> |
+
+</div>
+</div>
+
+<span class="small">Nhóm không chạy lại code tác giả (cần CUDA kernel riêng, khó dựng trên Colab) mà cài lại phần lõi rồi đối chiếu.</span>
+
+<!--
+Notes — Quang (1:15)
+
+• Slide này để trả lời trước một câu mà nhóm đoán thầy sẽ hỏi: code này ở đâu ra, và có tin được không.
+
+• Bên trái, phía trên là công thức recurrence mà Tiến vừa trình bày, phía dưới là vòng lặp thật trong code của nhóm. Mỗi bước lấy filter thứ n, lấy gate thứ n, cho qua tích chập FFT, rồi nhân với gate. Khớp một-một với công thức, không thêm không bớt bước nào.
+
+• Bên phải là bảng đối chiếu với bản chính chủ. Bốn thành phần lõi thì khớp: tích chập FFT có đệm gấp đôi rồi cắt lại phần đầu để giữ tính nhân quả, tích chập ngắn theo từng kênh, số phép chiếu bằng bậc N cộng một, và gating đệ quy bậc N.
+
+• Còn hai chỗ nhóm đơn giản hóa thì em xin nói thẳng luôn: filter dùng SiLU thay cho dạng sin, phần modulation rút gọn và bỏ skip-connection.
+
+• Vì vậy nhóm không dám nói đây là bản sao y bản gốc. Nhóm chỉ nói: phần lõi đã cài đúng, đủ để những con số sau đây có ý nghĩa.
+
+→ Chuyển: "Trước hết là kết quả về chất lượng."
 -->
 
 ---
 
 ## Kết quả E1: Perplexity (L=256)
 
+<div class="grid2">
+<div>
+
 | Model | Val loss | Val PPL |
 |---|---|---|
 | Transformer-small | 5.18 | 178.0 |
-| Hyena-small | 5.14 | 170.1 |
+| Hyena-small | **5.14** | **170.1** |
 
-<span class="small">20 epoch trên WikiText-2, chạy bằng notebook <code>notebooks/colab_E1_run.ipynb</code>. Đường PPL đã đi ngang (gần hội tụ).</span>
+Hai model cùng cỡ tham số cho perplexity gần như **ngang nhau** — Hyena nhỉnh hơn **~4%**, và thấp hơn ở **mọi epoch**.
 
-Nhận xét: hai model cùng cỡ tham số cho perplexity gần như ngang nhau, Hyena nhỉnh hơn **~4%**. Đủ để nói Hyena là một baseline ngôn ngữ hợp lệ ở quy mô này.
+<span class="small">20 epoch trên WikiText-2. Đường PPL đã đi ngang (gần hội tụ).</span>
+
+</div>
+<div class="center">
+
+![w:420px](../results/plots/E1_ppl.png)
+
+<span class="small">Val perplexity theo epoch</span>
+
+</div>
+</div>
+
+<div class="box">
+
+Đủ để kết luận: kiến trúc **không dùng attention** vẫn học ngôn ngữ ngang Transformer ở cùng cỡ tham số — Hyena là một baseline hợp lệ ở quy mô này.
+
+</div>
 
 <!--
-Notes:
-Trả lời câu hỏi 1: ở quy mô nhỏ, perplexity Hyena ngang (thậm chí hơn nhẹ) Transformer.
-Nhấn: đây là số chưa hội tụ, chỉ minh họa xu hướng.
+Notes — Quang (3:15)
+
+• Trước hết, perplexity là độ bối rối của model khi đoán token tiếp theo. Hiểu nôm na là trung bình model đang phân vân giữa bao nhiêu lựa chọn. Càng thấp thì càng tốt.
+
+• Sau hai mươi epoch, Transformer đạt perplexity khoảng 178, còn Hyena khoảng 170. Hyena thấp hơn khoảng bốn phần trăm (~4%).
+
+• Mời thầy và các bạn nhìn sang biểu đồ bên phải. Đây là perplexity theo từng epoch, đường của Hyena nằm dưới đường của Transformer ở mọi epoch, chứ không phải chỉ hơn ở điểm cuối.
+
+• Em xin nói thêm hai điều cho trung thực. Thứ nhất, nhìn vào biểu đồ thì thấy về cuối cả hai đường đều đã đi ngang, tức là gần hội tụ, nên đây là con số ổn định chứ không phải chụp đúng lúc đang dao động.
+
+• Thứ hai, khoảng cách bốn phần trăm là nhỏ, nên nhóm không kết luận Hyena tốt hơn Transformer nói chung; cũng có thể do Transformer chưa được tinh chỉnh kỹ.
+
+• Điều nhóm muốn rút ra là: một kiến trúc hoàn toàn không dùng attention vẫn học được ngôn ngữ ở mức tương đương Transformer. Như vậy đủ để xem Hyena là một baseline hợp lệ, và đây đúng là điều paper khẳng định.
+
+→ Chuyển: "Còn về tốc độ, đây mới là điểm mạnh thật sự của Hyena."
 -->
 
 ---
@@ -1089,54 +1213,58 @@ Nhấn: đây là số chưa hội tụ, chỉ minh họa xu hướng.
 
 ## Kết quả: tốc độ & bộ nhớ theo độ dài chuỗi
 
-Đo forward với input giả, cùng cấu hình ~16M tham số, batch 4, trên Colab T4:
-
-| L | TF (ms) | Hyena (ms) | TF (MB) | Hyena (MB) |
-|---|---|---|---|---|
-| 256 | 12.3 | 14.1 | 269 | 269 |
-| 512 | 22.8 | 22.7 | 468 | 468 |
-| 1024 | 52.3 | 45.5 | 866 | 864 |
-| 2048 | 131.4 | 90.4 | 1670 | 1653 |
-| 4096 | **383.9** | **179.7** | 3297 | 3234 |
-
-- **Tốc độ:** ở `L=256` Hyena chậm hơn chút (overhead FFT), hòa quanh `L=512`, rồi vượt dần: **1.45×** ở 2048 và **2.14×** ở 4096. Attention mỗi lần gấp đôi `L` tăng gần ×3 (bình phương), Hyena chỉ ×2 (tuyến tính).
-- **Bộ nhớ:** gần bằng nhau ở mọi `L` đo được — ở `d_model` nhỏ này, khác biệt $O(L^2)$ bộ nhớ của attention chưa lộ rõ; lợi thế thấy được nằm ở **thời gian**.
-
-<!--
-Notes:
-Trả lời câu hỏi 2: crossover quanh L=512, Hyena vượt rõ từ L=1024 — đúng xu hướng paper.
--->
-
----
-
-## Biểu đồ kết quả reproduction
-
 <div class="grid2">
+<div>
+
+<span class="small">Forward với input giả, ~16M tham số, batch 4, Colab T4:</span>
+
+| L | TF (ms) | Hyena (ms) | Tỉ lệ |
+|---|---|---|---|
+| 256 | 12.3 | 14.1 | 0.87× |
+| 512 | 22.8 | 22.7 | 1.00× |
+| 1024 | 52.3 | 45.5 | 1.15× |
+| 2048 | 131.4 | 90.4 | 1.45× |
+| 4096 | **383.9** | **179.7** | **2.14×** |
+
+</div>
 <div class="center">
 
-![w:430px](../results/plots/E1_ppl.png)
+![w:400px](../results/plots/reproduce_runtime.png)
 
-<span class="small">E1 — Perplexity theo epoch (WikiText-2, L=256)</span>
-
-</div>
-<div class="center">
-
-![w:430px](../results/plots/reproduce_runtime.png)
-
-<span class="small">Runtime forward theo độ dài chuỗi L</span>
+<span class="small">Runtime forward theo độ dài chuỗi</span>
 
 </div>
 </div>
 
-<div class="box">
-
-Hyena hội tụ **nhanh hơn** Transformer ở E1 (PPL thấp hơn ở mỗi epoch); runtime Hyena tăng **gần tuyến tính**, vượt Transformer từ `L≈1024` và đạt **2.14×** ở `L=4096`.
-
-</div>
+- **Tốc độ:** Hyena chậm hơn ở `L=256` (overhead FFT), hòa quanh `L=512`, rồi vượt dần. Mỗi lần gấp đôi `L`: attention tăng ~×2.5–3 (bình phương), Hyena chỉ ×2 (tuyến tính) — throughput Hyena giữ ~**90K token/s** ở mọi `L`, TF tụt từ 83K xuống 43K.
+- **Bộ nhớ:** gần bằng nhau (3297 vs 3234 MB ở `L=4096`) — ở `d_model` nhỏ này khác biệt $O(L^2)$ chưa lộ rõ; lợi thế thấy được nằm ở **thời gian**.
 
 <!--
-Notes:
-Chart > bảng số: cho khán giả thấy ngay xu hướng. Nhắc lại đây là số của nhóm (WikiText-2, 5 epoch chưa hội tụ), không phải số paper.
+Notes — Quang (3:45)
+
+• Ở thí nghiệm này nhóm đo thời gian một lượt forward khi tăng dần độ dài chuỗi, vẫn là model mười sáu triệu tham số, batch bằng bốn, chạy trên Colab T4. Xin lưu ý đây là phép đo tốc độ, tách riêng khỏi thí nghiệm perplexity vừa rồi.
+
+• Mời thầy và các bạn nhìn bảng từ trên xuống. Ở L bằng 256, Hyena thực ra còn chậm hơn một chút, mười bốn phẩy một mili-giây so với mười hai phẩy ba, vì FFT có chi phí cố định.
+
+• Đến L bằng 512 thì hai bên hòa nhau. Từ L bằng 1024, Hyena bắt đầu vượt lên, nhanh hơn khoảng một phẩy mười lăm lần (1.15×).
+
+• Lên 2048 là một phẩy bốn mươi lăm lần (1.45×). Và ở 4096, Transformer mất ba trăm tám mươi tư mili-giây, còn Hyena chỉ một trăm tám mươi, tức là nhanh hơn hai phẩy mười bốn lần (2.14×).
+
+• Cách nhìn rõ nhất là nhìn vào nhịp tăng. Cứ gấp đôi L một lần, Transformer tăng khoảng hai phẩy năm đến ba lần, vì chi phí đi theo bình phương. Còn Hyena thì tăng đúng gấp đôi, tức là gần tuyến tính.
+
+• Nói cách khác, thông lượng của Hyena giữ gần như không đổi, khoảng chín mươi nghìn token mỗi giây ở mọi độ dài, trong khi Transformer tụt từ tám mươi ba nghìn xuống còn bốn mươi ba nghìn.
+
+• Bây giờ mời thầy và các bạn nhìn sang biểu đồ bên phải, nó cho thấy điều đó rõ hơn cả bảng số. Đường của Transformer vọt lên theo dạng cong, còn đường của Hyena đi lên thoai thoải, gần như là một đường thẳng.
+
+• Hai đường cắt nhau quanh L bằng 512, và càng về sau thì càng cách xa nhau. Đây đúng là hình dạng mà lý thuyết dự đoán: một bên là L bình phương (L²), một bên là L nhân log L (L log L).
+
+• Về bộ nhớ thì hai bên gần bằng nhau ở mọi độ dài đo được, ba nghìn hai trăm chín mươi bảy so với ba nghìn hai trăm ba mươi tư mê-ga-bai ở L bằng 4096.
+
+• Ở số chiều ẩn nhỏ như thế này, phần bộ nhớ ô lớn của L bình phương bên phía attention chưa đủ lớn để lộ ra, nó vẫn bị lấn át bởi bộ nhớ của các lớp còn lại.
+
+• Vì vậy nhóm xin nói thẳng: lợi thế mà nhóm quan sát được nằm ở thời gian, chứ chưa nằm ở bộ nhớ. Và xin nhắc lại, đây là số của nhóm em trên WikiText-2, không phải số trong paper.
+
+→ Chuyển: "Trước khi kết luận, em xin nói thẳng những giới hạn."
 -->
 
 ---
@@ -1144,14 +1272,27 @@ Chart > bảng số: cho khán giả thấy ngay xu hướng. Nhắc lại đây
 ## Thảo luận và giới hạn
 
 - Ở chuỗi ngắn Hyena chậm hơn, vì chi phí FFT và đệm 2L lớn hơn phần tiết kiệm được. Hyena hòa ở khoảng `L = 512`, vượt lên từ `L = 1024` và nhanh **2.14×** ở `L = 4096`, đúng như lưu ý trong paper.
-- Bản cài của nhóm có **đơn giản hóa** so với safari: filter dùng SiLU thay cho activation dạng sin, modulation rút gọn, bỏ skip-connection. Vì vậy hội tụ có thể chậm hơn bản gốc.
+- Bản cài của nhóm có **đơn giản hóa** so với safari (SiLU thay activation dạng sin, modulation rút gọn, bỏ skip-connection) — vì vậy hội tụ có thể chậm hơn bản gốc.
 - Vì dùng thuần PyTorch và không có CUDA kernel, nhóm chưa đạt mức speedup tuyệt đối như paper.
 - Phần đo tốc độ dùng input giả để đo thời gian forward, không phải đánh giá perplexity trên tập validation.
 - Cần phân biệt rõ: số trên WikiText-103, The Pile và speedup từ 8K đến 64K là của **paper gốc**, còn số WikiText-2 ở đây là của **nhóm**.
 
 <!--
-Notes:
-Trung thực về giới hạn — đây là phần thầy hay hỏi. Nhấn mạnh ranh giới giữa số của paper và số của nhóm.
+Notes — Quang (2:00)
+
+• Nhóm em muốn rõ ràng về những điểm yếu, vì đây là một bài tái hiện chứ không phải một bài quảng cáo.
+
+• Thứ nhất, như vừa thấy, ở chuỗi ngắn thì Hyena chậm hơn thật, vì chi phí của FFT và việc phải đệm chuỗi lên gấp đôi còn lớn hơn phần tiết kiệm được. Lợi thế chỉ rõ từ khoảng L bằng 1024 trở lên, và điều này đúng với lưu ý trong paper.
+
+• Thứ hai, như em đã trình bày ở slide đối chiếu, bản cài của nhóm có vài chỗ đơn giản hóa. Điểm đáng kể nhất là dạng sin bắt tần số cao tốt hơn SiLU, nên bản của nhóm có thể hội tụ chậm hơn bản gốc.
+
+• Thứ ba, vì là thuần PyTorch, không có kernel tối ưu, nên nhóm chưa đạt được mức tăng tốc tuyệt đối như paper công bố.
+
+• Thứ tư, phần đo tốc độ dùng input giả để đo riêng thời gian forward, chứ không đánh giá chất lượng. Hai thí nghiệm này phải tách bạch, gộp chung lại là sai về mặt khoa học.
+
+• Và cuối cùng là một điểm về tính trung thực: các con số ấn tượng trên WikiText-103, trên The Pile, hay mức tăng tốc ở sáu mươi tư nghìn token, đều là của paper gốc. Còn những gì nhóm em trình bày chỉ là kết quả ở quy mô nhỏ trên WikiText-2.
+
+→ Chuyển: "Tóm lại."
 -->
 
 ---
@@ -1165,8 +1306,19 @@ Trung thực về giới hạn — đây là phần thầy hay hỏi. Nhấn m�
 > Quy mô nhỏ nhưng đủ để thấy tận mắt cơ chế dưới bậc hai mà bài báo đề xuất.
 
 <!--
-Notes:
-Chốt: hiểu *vì sao* attention mạnh và *vì sao* nó nghẽn — quan trọng hơn việc chạy lại được số lớn.
+Notes — Quang (0:45)
+
+• Em xin chốt lại bằng ba ý.
+
+• Một, nhóm đã tự cài được Hyena bằng thuần PyTorch, và phần lõi khớp với bản chính chủ ở ba chỗ quan trọng nhất: tích chập qua FFT có đệm gấp đôi độ dài, tích chập ngắn theo từng kênh, và gating đệ quy nhiều bậc.
+
+• Hai, nhóm quan sát đúng xu hướng chính của bài báo: chất lượng ngang Transformer, còn về tốc độ thì Hyena tăng gần tuyến tính trong khi attention tăng theo bình phương. Hai đường giao nhau quanh L bằng 512, và Hyena vượt lên rõ từ L bằng 1024.
+
+• Ba, bài học lớn nhất với nhóm là hiểu được vì sao attention nghẽn ở chuỗi dài, và thấy được giới hạn thực tế của việc tái hiện khi mình thiếu kernel tối ưu và thiếu tài nguyên.
+
+• Câu chốt: quy mô tuy nhỏ, nhưng đủ để nhóm em thấy tận mắt cơ chế dưới bậc hai mà bài báo đề xuất.
+
+→ Chuyển: "Đó là toàn bộ phần tái hiện."
 -->
 
 ---
@@ -1180,3 +1332,27 @@ Trần Tú Quang · Tô Huỳnh Minh Tiến · Nguyễn Cao Trung Kiên
 
 <span class="small">Tài liệu: Poli et al., *Hyena Hierarchy*, ICML 2023 · docs/poli23a.pdf
 Tài liệu nhóm: README.md · notebooks/colab_E1_run.ipynb</span>
+
+<!--
+Notes — Quang (0:30)
+
+• Đó là toàn bộ phần trình bày của nhóm 08. Chúng em xin cảm ơn thầy và các bạn đã lắng nghe.
+
+• Nhóm sẵn sàng nhận câu hỏi về dữ liệu, về cách cài đặt, hoặc về kết quả.
+
+[Đáp nhanh khi bị hỏi]
+
+• Perplexity là gì? Là độ bối rối của model khi đoán token tiếp theo, càng thấp càng tốt.
+
+• Sao perplexity vẫn cao? Vì model chỉ mười sáu triệu tham số và tập WikiText-2 nhỏ; đây là con số để so sánh tương đối giữa hai model, không phải con số tuyệt đối tốt.
+
+• So sánh có công bằng không? Có, hai model cùng cỡ tham số, cùng dữ liệu, cùng cách train, cùng phần cứng.
+
+• Sao Hyena chậm hơn ở chuỗi ngắn? Vì FFT phải đệm chuỗi lên gấp đôi rồi biến đổi qua lại, chi phí cố định đó lớn hơn phần tiết kiệm được khi L còn nhỏ.
+
+• FFT giúp gì? Cho phép tính tích chập dài với chi phí L nhân log L thay vì L bình phương.
+
+• Hyena khác Mamba hay H3 chỗ nào? Cùng họ thay thế attention, nhưng Hyena dùng tích chập dài tham số hóa ngầm cộng với gating, chứ không dùng state space tường minh.
+
+• Vì sao không chạy lại code của tác giả? Vì bản đó cần CUDA kernel viết riêng và phiên bản thư viện đời cũ, rất khó dựng lại trên Colab; bản thuần PyTorch là lựa chọn hợp lý cho đồ án.
+-->
