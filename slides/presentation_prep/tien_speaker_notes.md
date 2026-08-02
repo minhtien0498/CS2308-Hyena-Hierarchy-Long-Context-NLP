@@ -39,7 +39,7 @@ Phần này để đọc trôi miệng khi gặp công thức, ký hiệu và vi
 
 - `FFT`: khi nói nên đọc là "biến đổi Fourier nhanh"
 - `iFFT`: khi nói nên đọc là "biến đổi Fourier ngược"
-- `FFN`: khi nói nên đọc là "mạng truyền thẳng" hoặc "mạng feed-forward"
+- `FFN`: khi nói nên đọc là "mạng truyền thẳng" hoặc "mạng feed-forward"; nếu đọc từng chữ thì đọc là "ép ép en"
 - `CNN`: khi nói nên đọc là "mạng tích chập"
 - `SSM`: khi nói nên đọc là "mô hình không gian trạng thái"
 - `H3`: khi nói nên đọc là "mô hình H ba"
@@ -67,6 +67,7 @@ Phần này để đọc trôi miệng khi gặp công thức, ký hiệu và vi
 - `z^(n+1)`: khi nói nên đọc là "trạng thái ở bước kế tiếp"
 - `h_t`: khi nói nên đọc là "giá trị filter tại vị trí t"
 - `L x L`: khi nói nên đọc là "ma trận kích thước L nhân L"
+- `h[0...L-1]`: khi nói nên đọc là "vector filter h gồm các phần tử từ h không đến h L trừ một"
 
 ### Tên toán học nên đọc đơn giản
 
@@ -102,29 +103,31 @@ Phần này để đọc trôi miệng khi gặp công thức, ký hiệu và vi
 
 **Mục tiêu slide:** Chuyển mạch từ vấn đề của Attention sang động cơ ra đời của Hyena.
 
-**Lời thoại gợi ý:**
+**Lời thoại theo thứ tự trên slide:**
 
-"Ở phần trước, chúng ta đã thấy Self-Attention rất mạnh vì có thể trộn thông tin giữa mọi cặp token. Tuy nhiên, cái giá phải trả là chi phí tính toán và bộ nhớ tăng theo `O(L^2)`, nên khi sequence dài lên vài nghìn hay vài chục nghìn token thì đây trở thành nút thắt rất lớn.
+"Ở slide này, em bắt đầu bằng câu hỏi chính: nếu Self-Attention mạnh nhưng bị kẹt ở chi phí `O(L^2)`, thì Hyena thay nó bằng cơ chế nào?
 
-Vì vậy, câu hỏi mà bài báo đặt ra là: liệu có thể xây một toán tử không dùng attention, nhưng vẫn giữ được khả năng xử lý phụ thuộc xa và vẫn đủ mạnh cho language modeling hay không?
+**1. Phần câu hỏi trung tâm**
 
-Liên hệ với slide trước của Kiên, paper nêu ba tính chất cần giữ lại từ attention: thứ nhất là **data control**, tức phép trộn phụ thuộc vào input; thứ hai là **unrestricted context**, tức có thể nối thông tin ở khoảng cách rất xa; và thứ ba là **sublinear parameter scaling**, tức số tham số không tăng trực tiếp theo độ dài chuỗi.
+Vấn đề trung tâm ở đây là: Hyena không cố tạo lại ma trận attention, mà thay bằng một operator không dùng attention. Operator này dựa trên hai ý chính là long convolution và data-controlled gating.
 
-Hyena là câu trả lời của paper này. Điểm quan trọng là Hyena không cố xấp xỉ trực tiếp ma trận attention. Thay vào đó, nó thiết kế một operator hoàn toàn khác, dựa trên hai thành phần chính là long convolution và data-controlled gating."
+**2. Phần bảng so sánh Attention và Hyena**
 
-**Đoạn nói box và bảng trên slide:**
+Với Attention, mô hình trộn thông tin toàn chuỗi bằng cách xét quan hệ giữa mọi cặp token, nên phải tạo ma trận kích thước `L x L`. Vì vậy khi chuỗi dài, chi phí tăng rất nhanh.
 
-"Box trên slide là câu hỏi trung tâm của phần này: Hyena thay self-attention bằng toán tử nào, và vì sao rẻ hơn khi context dài?
+Với Hyena, phần trộn xa được thực hiện bằng long convolution, nên vẫn có unrestricted context, tức vẫn có thể nối thông tin ở khoảng cách rất xa. Sau đó Hyena dùng gating phụ thuộc input để chọn lọc tín hiệu, nên vẫn giữ được data control, tức phép trộn không hoàn toàn cố định mà phụ thuộc dữ liệu.
 
-Mình đọc bảng theo từng dòng. Attention trộn thông tin toàn chuỗi nhưng phải tạo ma trận `L x L`; Hyena thay phần trộn đó bằng long convolution. Attention có trọng số phụ thuộc nội dung; Hyena giữ tinh thần này bằng data-controlled gating. Cuối cùng, attention tốn `O(L^2)` trên context dài, còn long convolution của Hyena được tính bằng FFTConv nên còn khoảng `O(L log L)` cho mỗi convolution."
+**3. Phần liên hệ với slide của Kiên**
 
-**Câu nhấn mạnh nên nói chậm:**
+Liên hệ với **slide 15/38 của Kiên - Khoảng cách năng lực**, paper nói có ba tính chất cần giữ lại từ attention: data control, unrestricted context, và số tham số không tăng trực tiếp theo độ dài chuỗi. Hyena là câu trả lời cho ba yêu cầu đó.
 
-> Hyena là một attention-free operator, không phải một bản attention rút gọn.
+**4. Phần chốt ý**
+
+Câu chốt ở slide này là: Hyena là một attention-free operator, tức là một toán tử không dùng attention. Nó không phải một bản attention rút gọn hay xấp xỉ trực tiếp attention matrix."
 
 **Câu chuyển sang slide 19/38:**
 
-"Vậy hai thành phần cốt lõi đó là gì, và vì sao kết hợp của chúng lại đủ mạnh?"
+"Vậy operator đó hoạt động cụ thể bằng những bước nào?"
 
 ---
 
@@ -132,54 +135,37 @@ Mình đọc bảng theo từng dòng. Attention trộn thông tin toàn chuỗi
 
 **Mục tiêu slide:** Cho người nghe trực giác tổng quan trước khi vào công thức.
 
-**Lời thoại gợi ý:**
+**Lời thoại theo thứ tự trên slide:**
 
-"Ý tưởng chính của Hyena có thể tóm gọn trong một câu: dùng **long convolution** để mang thông tin từ xa, và dùng **gating** để quyết định thông tin nào thực sự nên đi tiếp.
+"Slide này tóm tắt ý tưởng chính của Hyena: **long convolution cộng với data-controlled gating**.
 
-Long convolution cho phép mỗi vị trí nhìn được toàn bộ chuỗi, nên nó đóng vai trò cung cấp global context. Nhưng nếu chỉ có convolution thì phép biến đổi này khá tĩnh, tức là cùng một filter áp lên mọi input.
+**1. Phần hai thành phần chính**
 
-Vì vậy Hyena thêm gating. Gate được sinh ra từ chính input, rồi nhân element-wise với đầu ra của convolution. Nhờ đó, phép biến đổi trở nên phụ thuộc dữ liệu, gần hơn với tinh thần của attention.
+Thành phần thứ nhất là long convolution. Đây là phần giúp mô hình mang thông tin từ xa về. Thay vì token hiện tại chỉ nhìn được một vùng gần, filter dài cho phép thông tin từ các token rất xa phía trước vẫn ảnh hưởng đến output hiện tại. Đây là phần tạo global context.
 
-Khi lặp lại nhiều bước convolution cộng gating như vậy, ta có cái gọi là Hyena hierarchy."
+Nhưng nếu chỉ có convolution thì phép biến đổi còn khá tĩnh, vì một filter học xong sẽ được dùng lại cho nhiều input khác nhau. Vì vậy Hyena thêm thành phần thứ hai là gating. Gate được sinh từ chính input, rồi nhân element-wise với tín hiệu sau convolution. Element-wise ở đây nghĩa là nhân từng phần tử, cụ thể là từng vị trí token và từng channel tương ứng, để quyết định phần tín hiệu nào đi tiếp mạnh hay yếu.
 
-**Đoạn nói pipeline trên slide:**
+**2. Phần pipeline tổng quát**
 
-"Đoạn pipeline trên slide nên đọc chậm theo đúng thứ tự.
+Luồng tính toán có thể đọc từ input đến output như sau. Input ban đầu là `u`. Từ `u`, mô hình dùng các linear projection để tách ra nhiều nhánh: các gate từ `x1` đến `xN` và một nhánh value `v`.
 
-Đầu tiên, input của block là `u`. Từ `u`, Hyena dùng các linear projection để tách ra nhiều nhánh: các gate `x1` đến `xN`, và nhánh value `v`.
+Sau đó đặt `z1 = v`, nghĩa là trạng thái đầu tiên lấy từ value stream.
 
-Ở đây `v` là nhánh giá trị ban đầu, còn `x1` đến `xN` là các gate sẽ dùng ở từng bước recurrence.
+**Tên công thức:** Hyena recurrence - công thức lặp của Hyena, dạng trực giác.
 
-Trong Algorithm 1 của paper, các projection này còn đi qua một short depthwise convolution trước khi split. Trên slide mình có thể bỏ qua chi tiết này khi nói chính, vì slide đang muốn nhấn mạnh luồng operator cốt lõi.
+**Cách đọc:** `z(n+1) = x(n) * Conv(h(n), z(n))` đọc là: `z(n+1)`, tức trạng thái ở bước kế tiếp, bằng `x(n)`, tức gate ở bước `n`, nhân với `Conv(h(n), z(n))`, tức kết quả convolution giữa filter `h(n)` và trạng thái hiện tại `z(n)`.
 
-Sau đó ta khởi tạo:
+**Giải thích:** Vế trái `z(n+1)` là kết quả sau một vòng xử lý. Vế phải có hai phần: `Conv(h(n), z(n))` là phần long convolution để trộn thông tin xa, còn `x(n)` là gate để lọc kết quả đó. Dấu nhân giữa `x(n)` và kết quả convolution là nhân từng phần tử, tức từng vị trí token và từng channel tương ứng.
 
-`z1 = v`
+**Ý nghĩa:** Mỗi vòng Hyena làm hai việc: convolution để kéo thông tin xa về, rồi gate để chọn phần thông tin nào được giữ lại.
 
-Nghĩa là trạng thái đầu tiên của Hyena lấy từ nhánh `v`.
+**3. Phần output**
 
-Tiếp theo, mô hình lặp công thức:
-
-`z(n+1) = x(n) * Conv(h(n), z(n))`
-
-Đọc bằng lời là: ở bước `n`, lấy trạng thái hiện tại `z(n)`, cho đi qua long convolution với filter `h(n)`, rồi nhân element-wise với gate `x(n)`.
-
-Sau vài bước như vậy, trạng thái cuối cùng được đưa ra thành output `y`."
-
-**Ví dụ trực giác nên nói sau pipeline:**
-
-"Có thể hiểu `v` là dòng thông tin chính đang được xử lý. Các gate `x1` đến `xN` giống như các tín hiệu điều khiển được sinh từ cùng input `u`. Mỗi vòng convolution đưa thông tin xa vào `z`, còn gate quyết định thông tin đó có nên đi tiếp mạnh hay yếu.
-
-Vì vậy slide này không nên hiểu là Hyena chỉ có convolution. Ý đúng là: convolution cho khả năng nhìn xa, gating làm việc nhìn xa đó phụ thuộc vào input."
-
-**Trực giác ngắn nên chốt:**
-
-- Convolution: "mang thông tin đi xa"
-- Gating: "chọn thông tin nào được giữ lại"
+Lặp như vậy qua nhiều bước thì thu được output `y`. Trực giác ngắn là: convolution mang thông tin đi xa, còn gating chọn thông tin nào nên được giữ lại. Khi hai phần này lặp nhiều lần, ta có Hyena hierarchy."
 
 **Câu chuyển sang slide 20/38:**
 
-"Trước tiên, mình đi vào thành phần đầu tiên là long convolution."
+"Mình đi vào thành phần đầu tiên trước: long convolution."
 
 ---
 
@@ -187,45 +173,43 @@ Vì vậy slide này không nên hiểu là Hyena chỉ có convolution. Ý đú
 
 **Mục tiêu slide:** Làm rõ long convolution khác CNN thường ở đâu và vì sao nó quan trọng.
 
-**Cách đọc khi nói:**
+**Lời thoại theo thứ tự trên slide:**
 
-- `CNN`: nên nói là "mạng tích chập"
-- `L`: nên nói là "độ dài chuỗi"
-- Nếu có nhắc công thức convolution: đọc ý nghĩa, không cần đọc từng ký hiệu
-- `L x L`: nên nói là "ma trận kích thước L nhân L"
+"Slide này so sánh convolution thông thường với long convolution của Hyena.
 
-**Lời thoại gợi ý:**
+**1. Phần so sánh CNN thường và Hyena**
 
-"Trong CNN truyền thống, kernel thường ngắn, ví dụ chỉ bao phủ vài vị trí lân cận. Điều đó rất tốt cho local pattern, nhưng không thuận lợi nếu ta cần học các phụ thuộc rất xa trong chuỗi văn bản.
+Với CNN thường, kernel ngắn và chủ yếu nhìn vùng gần. Nghĩa là token hiện tại chỉ nhận tín hiệu từ vài token lân cận, nên cách này tốt cho local pattern, ví dụ cụm từ ngắn hoặc mẫu gần nhau.
 
-Hyena đi theo hướng khác: filter của nó có thể dài bằng toàn bộ sequence length `L`. Điều này có nghĩa là một token ở hiện tại có thể nhận tín hiệu từ rất xa về trước thông qua phép tích chập.
+Với Hyena, filter có thể dài bằng sequence, tức có thể trải trên toàn bộ độ dài chuỗi `L`. Vì vậy token hiện tại có thể nhận tín hiệu từ rất xa phía trước. Với language modeling, đây là causal convolution, nghĩa là chỉ nhìn về quá khứ, không nhìn sang tương lai.
 
-Nói đơn giản, thay vì chỉ nhìn cửa sổ nhỏ quanh một token, Hyena cho phép lan truyền thông tin trên toàn chiều dài chuỗi. Với language modeling, đây là causal convolution, nên token hiện tại nhận thông tin từ quá khứ xa chứ không nhìn sang tương lai.
+**2. Phần công thức convolution**
 
-Tuy nhiên, nếu tính long convolution trực tiếp trong miền thời gian thì chi phí vẫn cao. Do đó, long convolution chỉ thực sự hữu ích khi đi kèm một cách tính hiệu quả hơn, và phần đó sẽ xuất hiện ở slide FFTConv."
+**Tên công thức:** Causal long convolution - tích chập dài nhân quả.
 
-**Đoạn nói hai box CNN thường / Hyena:**
+**Cách đọc:** `(h * u)_t = sum h_(t-i) u_i` đọc là: `(h * u)_t`, tức kết quả convolution tại vị trí `t`, bằng tổng của các tích `h_(t-i) u_i`, trong đó mỗi token quá khứ `u_i` được nhân với trọng số filter tương ứng `h_(t-i)`.
 
-"Hai box ở giữa slide chỉ để so sánh receptive field. CNN thường dùng kernel ngắn nên chủ yếu bắt pattern gần. Còn Hyena dùng filter dài bằng sequence, nên token hiện tại có thể nhận tín hiệu từ rất xa phía trước. Điểm này không có nghĩa Hyena giống attention, mà chỉ là nó có một cách khác để mở rộng context."
+**Giải thích:** Vế trái `(h * u)_t` là output sau convolution tại token hiện tại `t`. Trong ngoặc `(h * u)`, `h` là filter, `u` là chuỗi input, và dấu `*` là phép convolution. Vế phải là tổng theo chỉ số `i`; `u_i` là token ở vị trí quá khứ `i`, còn `h_(t-i)` là trọng số filter ứng với khoảng cách từ vị trí `i` đến vị trí hiện tại `t`.
 
-**Đoạn nói công thức/ví dụ trên slide:**
+**Ý nghĩa:** Để tạo output ở token hiện tại, mô hình lấy token hiện tại, token ngay trước đó, token trước nữa, và tiếp tục như vậy về quá khứ; mỗi token được nhân với một trọng số trong filter `h`, rồi tất cả được cộng lại.
 
-"Nếu cần nói bằng một công thức đơn giản, output tại vị trí `t` có thể hiểu là tổng có trọng số của các token trước đó:
+**3. Phần ví dụ đọc công thức**
 
-`y_t = h_0*x_t + h_1*x_(t-1) + h_2*x_(t-2) + ...`
+Ví dụ dễ đọc hơn là:
 
-Ở đây các hệ số `h_0`, `h_1`, `h_2` là filter. `h_0` quyết định token hiện tại ảnh hưởng bao nhiêu, `h_1` quyết định token ngay trước đó ảnh hưởng bao nhiêu, và nếu filter rất dài thì `h_1000` có thể quyết định token cách 1000 bước ảnh hưởng bao nhiêu.
+`output_t = h0 * token_t + h1 * token_(t-1) + h2 * token_(t-2) + ...`
 
-Điểm chính là: với kernel ngắn như CNN thường, ta chỉ có vài hệ số gần hiện tại. Với long convolution, filter có hệ số cho rất nhiều khoảng cách, nên receptive field có thể phủ toàn chuỗi."
+Nghĩa là `h0` là trọng số cho token hiện tại, `h1` là trọng số cho token ngay trước đó, `h2` là trọng số cho token cách hai bước. Nếu filter đủ dài, thì token cách rất xa, ví dụ cách 1000 bước, vẫn có một trọng số riêng và vẫn có thể đóng góp vào output hiện tại.
 
-**Điểm cần tránh nói quá đà:**
+Vậy câu nói gọn nhưng đủ ý là: long convolution tạo output hiện tại bằng cách cộng có trọng số nhiều token trong quá khứ, và filter càng dài thì mô hình càng có khả năng lấy thông tin từ xa.
 
-- Không nói convolution "giống hệt attention".
-- Chỉ nên nói nó giúp **truy cập ngữ cảnh dài** theo cách có cấu trúc.
+**4. Phần minh họa trực quan**
+
+Có thể hình dung trực quan như sau: CNN vùng gần chỉ nhìn một cửa sổ nhỏ quanh token `t`, còn long convolution có thể kéo thông tin từ xa về token `t`. Điểm cần chốt là Hyena mở rộng context bằng convolution có cấu trúc, chứ không tạo ma trận attention `L x L`."
 
 **Câu chuyển sang slide 21/38:**
 
-"Nhưng chỉ có nhìn xa thôi vẫn chưa đủ. Mô hình còn cần biết thông tin xa nào là quan trọng với từng input cụ thể."
+"Nhưng chỉ nhìn xa thôi chưa đủ; mô hình còn cần biết thông tin xa nào là quan trọng với từng input."
 
 ---
 
@@ -233,43 +217,39 @@ Tuy nhiên, nếu tính long convolution trực tiếp trong miền thời gian 
 
 **Mục tiêu slide:** Giải thích vì sao gating là điểm giúp Hyena vượt convolution tĩnh.
 
-**Cách đọc khi nói:**
+**Lời thoại theo thứ tự trên slide:**
 
-- `x^n`: nên nói là "gate ở bước n"
-- `input`: nên nói là "đầu vào"
-- `element-wise`: nên nói là "theo từng phần tử"
+"Slide này giải thích thành phần thứ hai là data-controlled gating, tức cơ chế gate được điều khiển bởi dữ liệu đầu vào.
 
-**Lời thoại gợi ý:**
+**1. Phần vấn đề của convolution thuần**
 
-"Nếu chỉ dùng convolution, filter thường khá cố định sau khi học xong. Nghĩa là với hai câu khác nhau, cách tổng hợp thông tin theo thời gian vẫn đi qua cùng một filter. Đây là một hạn chế nếu ta muốn mô hình linh hoạt theo nội dung.
+Vấn đề là nếu chỉ dùng convolution thuần, mô hình tuy nhìn được xa nhưng cách trộn thông tin vẫn khá cố định. Sau khi filter đã học xong, cùng một filter có thể được áp lên nhiều câu khác nhau. Điều này làm mô hình thiếu linh hoạt, vì trong mỗi câu, phần thông tin quan trọng có thể nằm ở những vị trí khác nhau.
 
-Hyena xử lý điểm này bằng data-controlled gating. Cụ thể, từ input ban đầu, mô hình chiếu ra các tensor `x^n`, và các tensor này sẽ nhân trực tiếp với đầu ra của convolution ở từng bước.
+Hyena giải quyết bằng cách sinh gate từ chính input. Có thể hiểu gate là một bộ điều chỉnh tín hiệu: sau khi convolution kéo thông tin xa về, gate sẽ quyết định phần nào nên đi tiếp mạnh hơn, phần nào nên bị giảm xuống.
 
-Nhờ đó, dù filter mang thông tin từ xa về, gate sẽ quyết định tín hiệu nào được tăng lên, tín hiệu nào bị làm yếu đi. Có thể hiểu gate đóng vai trò chọn lọc theo ngữ cảnh hiện tại.
+**2. Phần element-wise**
 
-Đây là điểm rất quan trọng vì nó làm Hyena khác với convolution thuần: output không còn là một phép biến đổi hoàn toàn tĩnh, mà đã phụ thuộc vào dữ liệu đầu vào."
+Phép nhân ở đây là element-wise, tức là nhân từng phần tử tương ứng. Nói cụ thể hơn, tại mỗi vị trí token và mỗi channel, giá trị gate sẽ nhân với giá trị output của convolution ở đúng vị trí và channel đó.
 
-**Đoạn nói công thức/ví dụ trên slide:**
+**3. Phần ví dụ số**
 
-"Trên slide có ý `gate x^n` nhân với output convolution. Có thể nói đơn giản là:
+Ví dụ số có thể hiểu như sau. Sau bước convolution, giả sử mô hình đã kéo được một số tín hiệu từ context dài về token hiện tại. Các số như `0.4` hay `0.9` đại diện cho độ mạnh của tín hiệu sau convolution. Gate tương ứng, ví dụ `0.1` hay `0.7`, đại diện cho mức độ mô hình muốn cho tín hiệu đó đi tiếp.
 
-`new_signal_t = gate_t * conv_output_t`
+Nếu tín hiệu sau convolution là `0.4` nhưng gate chỉ là `0.1`, khi nhân lại ta được `0.04`. Nghĩa là dù convolution có mang tín hiệu đó về, gate vẫn quyết định giảm nó xuống rất mạnh, có thể vì tín hiệu đó không quan trọng trong ngữ cảnh hiện tại.
 
-Nếu `gate_t` nhỏ, tín hiệu sau convolution ở vị trí đó bị giảm. Nếu `gate_t` lớn, tín hiệu được cho đi qua mạnh hơn.
+Ngược lại, nếu tín hiệu sau convolution là `0.9` và gate là `0.7`, kết quả là `0.63`. Tín hiệu này vẫn còn khá lớn sau gating, nghĩa là mô hình đang cho phép thông tin đó tiếp tục đi qua vì nó có vẻ hữu ích hơn.
 
-Ví dụ, cùng là thông tin cách 100 token phía trước, nhưng trong câu này nó liên quan đến chủ ngữ chính, còn trong câu khác nó chỉ là chi tiết phụ. Gate giúp mô hình điều chỉnh theo từng input, thay vì dùng cùng một mức ảnh hưởng cố định cho mọi câu."
+Nói ngắn gọn, convolution trả lời câu hỏi: thông tin nào từ xa được đưa về? Còn gate trả lời câu hỏi: trong input hiện tại, thông tin đó nên được giữ lại bao nhiêu?
 
-**Đoạn nói hai box ví dụ số:**
+**4. Phần chốt ý**
 
-"Hai box số trên slide minh họa phép nhân gate. Bên trái là output sau convolution và gate được sinh từ input. Bên phải là kết quả sau khi nhân từng phần tử. Ví dụ `0.4` nhân với `0.1` thành `0.04`, nghĩa là tín hiệu đó bị giảm mạnh. Còn `0.9` nhân với `0.7` thành `0.63`, nghĩa là tín hiệu vẫn được giữ tương đối nhiều. Gate không phải công tắc 0/1 cứng, mà là hệ số liên tục để điều chỉnh cường độ tín hiệu."
+Điểm quan trọng là gate không phải công tắc bật tắt cứng. Nó là hệ số liên tục để điều chỉnh cường độ tín hiệu. Vì gate phụ thuộc input, Hyena không còn là convolution tĩnh nữa, mà có khả năng chọn lọc thông tin theo nội dung, gần hơn với tinh thần data-dependent của attention.
 
-**Ví dụ trực giác ngắn nên thêm khi nói:**
-
-"Trong một đoạn văn dài, không phải thông tin xa nào cũng hữu ích. Gate học cách giữ lại phần liên quan và giảm phần nhiễu."
+Câu chốt của slide này là: long convolution giúp nhìn xa, còn gating giúp chọn đúng thông tin xa cần giữ lại."
 
 **Câu chuyển sang slide 22/38:**
 
-"Hai ý tưởng vừa rồi được kết hợp lại trong công thức trung tâm của Hyena."
+"Hai thành phần này được ghép lại trong công thức trung tâm của Hyena."
 
 ---
 
@@ -277,76 +257,43 @@ Ví dụ, cùng là thông tin cách 100 token phía trước, nhưng trong câu
 
 **Mục tiêu slide:** Giải thích công thức quan trọng nhất thật rõ ràng, không quá nặng ký hiệu.
 
-**Cách đọc khi nói:**
+**Lời thoại theo thứ tự trên slide:**
 
-- `z^(n+1)_t = x^n_t * (h^n * z^n)_t`
-  nên nói là: "trạng thái ở bước kế tiếp tại vị trí t bằng gate tại vị trí t nhân với kết quả tích chập giữa filter bước n và trạng thái trung gian bước n"
-- `z^n`: nên nói là "trạng thái trung gian ở bước n"
-- `h^n`: nên nói là "filter ở bước n"
-- `x^n_t`: nên nói là "gate tại vị trí t ở bước n"
-- `N`: nên nói là "số bậc" hoặc "số lần lặp"
+"Đây là slide quan trọng nhất về cơ chế.
 
-**Lời thoại gợi ý:**
+**1. Phần công thức trung tâm**
 
-"Đây là công thức trung tâm của Hyena:
+**Tên công thức:** Hyena recurrence - công thức lặp lõi của Hyena.
 
-`z^(n+1)_t = x^n_t * (h^n * z^n)_t`
+**Cách đọc:** `z^(n+1)_t = x^n_t * (h^n * z^n)_t` đọc là: `z^(n+1)_t`, tức trạng thái mới tại vị trí `t`, bằng `x^n_t`, tức gate tại vị trí `t` ở bước `n`, nhân với mở ngoặc `(h^n * z^n)_t`, tức kết quả long convolution giữa filter bước `n` và trạng thái trung gian bước `n` tại vị trí `t`, rồi đóng ngoặc.
 
-Ta có thể đọc công thức này từng lớp ý nghĩa.
+**Giải thích:** Vế trái `z^(n+1)_t` là kết quả sau khi cập nhật trạng thái ở bước kế tiếp, tại token `t`. Vế phải có hai phần. Phần ngoài là `x^n_t`, tức gate tại token `t`. Phần trong ngoặc `(h^n * z^n)_t` là long convolution: `h^n` là filter dài ở bước `n`, `z^n` là trạng thái trung gian hiện tại, dấu `*` trong ngoặc là convolution, và chỉ số `_t` nghĩa là lấy kết quả tại token hiện tại. Sau đó gate `x^n_t` nhân vào kết quả convolution ở cùng vị trí.
 
-Thứ nhất, `z^n` là trạng thái trung gian ở bước thứ `n`.
+**Ý nghĩa:** Mỗi bước Hyena lấy trạng thái hiện tại, trộn thông tin xa bằng convolution, rồi dùng gate để lọc tín hiệu đó. Nếu gate lớn thì tín hiệu sau convolution được giữ mạnh hơn; nếu gate nhỏ thì tín hiệu bị giảm xuống. Kết quả là `z^(n+1)_t`, tức trạng thái mới ở bước kế tiếp tại token `t`.
 
-Thứ hai, `h^n * z^n` là phép long convolution. Bước này chịu trách nhiệm gom và truyền thông tin dài hạn trong chuỗi.
+**2. Phần bảng ký hiệu**
 
-Thứ ba, `x^n_t` là gate tại vị trí `t`, được sinh từ input. Gate này nhân element-wise với kết quả convolution, nên nó điều khiển lượng thông tin được đi tiếp.
+Các ký hiệu cần nhớ là: `z1 = v` là value stream ban đầu; `h^n` là filter dài ở bước `n`; `x^n_t` là gate tại token `t`; và `N` là số bậc, hay số lần lặp recurrence.
 
-Sau đó kết quả trở thành `z^(n+1)`, và quá trình tiếp tục lặp lại. Nếu lặp `N` lần, ta thu được Hyena order `N`.
+**3. Phần pipeline bốn bước**
 
-Điểm trực giác ở đây là: convolution đóng vai trò memory trên chiều dài chuỗi, còn gate đóng vai trò content-based control."
+Quy trình thao tác có thể nói theo đúng bốn bước được đánh số.
 
-**Đoạn nói công thức trên slide thật chậm:**
+Bước 1, bắt đầu từ `z(n)`. Đây là trạng thái hiện tại, tức biểu diễn trung gian mà mô hình đang giữ ở bước thứ `n`.
 
-"Công thức này nên đọc từ trong ra ngoài.
+Bước 2, đưa `z(n)` qua long convolution với filter `h(n)`. Bước này tạo ra một tín hiệu mới đã gom thông tin từ nhiều vị trí trong quá khứ, nên nó chịu trách nhiệm cho phần long-context.
 
-Đầu tiên là phần trong ngoặc:
+Bước 3, nhân tín hiệu sau convolution với gate `x(n)`. Gate này cũng nằm ở bước `n`, và được sinh từ input, nên nó quyết định phần tín hiệu nào nên được giữ lại mạnh hơn hoặc làm yếu đi.
 
-`(h^n * z^n)_t`
+Bước 4, kết quả sau khi nhân gate trở thành `z(n+1)`, tức trạng thái mới cho bước tiếp theo. Nếu làm quá trình này một lần thì là order 1; làm hai lần thì là order 2; tổng quát nếu lặp `N` lần thì ta có Hyena order `N`.
 
-Nó nghĩa là: tại vị trí `t`, lấy trạng thái trung gian `z^n`, trộn thông tin dài hạn bằng filter `h^n`, rồi lấy kết quả ở vị trí `t`.
+**4. Phần output và chốt ý**
 
-Sau đó mới đến phần bên ngoài:
-
-`x^n_t * (...)`
-
-Nó nghĩa là: dùng gate tại vị trí `t` để nhân vào kết quả convolution. Vì gate này được sinh từ input, nên bước chọn lọc phụ thuộc vào dữ liệu.
-
-Cuối cùng ta thu được:
-
-`z^(n+1)_t`
-
-tức là trạng thái mới tại vị trí `t`. Nếu nói cực ngắn, mỗi bước Hyena là: trộn xa bằng convolution, rồi lọc bằng gate."
-
-**Đoạn nói bảng và pipeline trên slide:**
-
-"Bảng bên trái giúp mình giải nghĩa ký hiệu: `z1 = v` là value stream ban đầu, `h^n` là filter dài ở bước `n`, `x^n_t` là gate tại token `t`, và `N` là số bậc. Pipeline bên phải là cách đọc công thức bằng thao tác: lấy `z(n)`, convolution với `h(n)`, nhân gate `x(n)`, rồi ra `z(n+1)`. Nếu khán giả nhớ được pipeline này thì đã hiểu phần lõi của Hyena."
-
-**Ví dụ nói miệng cho `N = 2`:**
-
-"Nếu `N = 2`, mô hình làm việc này hai lần. Lần đầu trộn thông tin dài hạn từ input hoặc trạng thái ban đầu. Sau đó gate lọc lại. Lần thứ hai tiếp tục trộn trên biểu diễn đã được lọc, nên operator có thể biểu diễn quan hệ phức tạp hơn một convolution đơn."
-
-**Câu nên nói rất rõ:**
-
-> Hyena không chỉ convolution một lần; nó lặp nhiều bước convolution và gating theo dạng recurrence.
-
-**Liên hệ code nếu cần chỉ tay vào repo:**
-
-- `models/hyena.py`
-- lớp `HyenaOperator`
-- hàm recurrence nằm trong `forward`
+Câu nói ngắn cho công thức này là: mỗi bước Hyena làm hai việc, trộn xa bằng convolution rồi lọc theo input bằng gate. Vì vậy Hyena không chỉ convolution một lần, mà là một recurrence gồm nhiều bước convolution và gating."
 
 **Câu chuyển sang slide 23/38:**
 
-"Từ đó, khái niệm 'hierarchy' trong tên Hyena cũng trở nên rõ hơn."
+"Từ recurrence này, chữ hierarchy trong Hyena sẽ rõ hơn."
 
 ---
 
@@ -354,35 +301,29 @@ tức là trạng thái mới tại vị trí `t`. Nếu nói cực ngắn, mỗ
 
 **Mục tiêu slide:** Giải thích "hierarchy" và vai trò của `N`.
 
-**Cách đọc khi nói:**
+**Lời thoại theo thứ tự trên slide:**
 
-- `Order-N`: nên nói là "Hyena bậc N"
-- `N`: nên nói là "số bậc"
-- `order = 2`: nên nói là "mô hình đang dùng hai bước lặp"
+"Slide này nói về order-N hierarchy. `N` ở đây là số bậc của Hyena, hay đơn giản là số lần lặp khối convolution cộng gating.
 
-**Lời thoại gợi ý:**
+**1. Phần ý nghĩa của order-N**
 
-"Từ 'hierarchy' trong Hyena nghĩa là operator này có nhiều bậc, hay nhiều tầng recurrence. `N` chính là số lần lặp lại khối convolution cộng gating mà mình vừa mô tả.
+Khi `N` tăng thì operator có thêm nhiều tầng tương tác có cấu trúc. Order 1 nghĩa là một lần trộn xa rồi gating. Order 2 nghĩa là làm thêm một vòng nữa trên trạng thái đã được xử lý. Order cao hơn cho mô hình thêm cơ hội kết hợp thông tin xa với điều khiển theo nội dung.
 
-Khi `N` tăng, khả năng biểu diễn của operator cũng tăng, vì mô hình có nhiều bước để trộn thông tin dài hạn với điều khiển theo dữ liệu.
+**2. Phần liên hệ H3/GSS/SSM**
 
-Paper cũng đặt Hyena trong một họ kiến trúc rộng hơn. Cụ thể, paper nói H3 tương ứng với Hyena bậc 2, còn GSS tương ứng với Hyena bậc 1 nếu chọn một cách tham số hóa filter cụ thể bằng SSM. Vì vậy có thể nói Hyena tổng quát hóa các hướng này bằng recurrence bậc `N` và filter implicit tự do hơn.
+Paper cũng liên hệ Hyena với các kiến trúc trước đó. H3 có thể xem như một trường hợp gần với Hyena bậc 2, còn GSS gần với Hyena bậc 1 nếu filter được tham số hóa theo SSM. Ở đây `SSM` là State Space Model, tiếng Việt là mô hình không gian trạng thái; nói đơn giản, đây là một hướng attention-free dùng trạng thái ẩn để truyền thông tin theo chuỗi. Ý này không cần chứng minh sâu trên slide; chỉ cần nắm rằng Hyena tổng quát hóa các cách trộn chuỗi có cấu trúc bằng cách thêm nhiều bậc recurrence.
 
-Trong reproduction của nhóm, để giữ mô hình gọn và train được trong phạm vi môn học, ta dùng cấu hình nhỏ với `order = 2`. Tức là mỗi block Hyena lặp hai bước recurrence."
+**3. Phần pipeline order**
 
-**Đoạn nói ví dụ trên slide:**
+Có thể hình dung order 1 là một vòng convolution plus gating. Order 2 là hai vòng. Order `N` là lặp `N` vòng. Mỗi vòng thêm một tầng tương tác, nhưng cũng thêm chi phí, nên trong repo nhóm mình dùng `order = 2` để cân bằng giữa minh họa đúng cơ chế và khả năng train trong phạm vi môn học.
 
-"Có thể hình dung `order = 1` giống như một lần convolution rồi gating. `order = 2` là làm thêm một vòng nữa trên trạng thái đã được xử lý. Order cao hơn cho mô hình thêm cơ hội để kết hợp thông tin xa và điều khiển theo nội dung.
+**4. Phần chốt ý**
 
-Tuy nhiên, mỗi lần tăng order là thêm chi phí, vì phải thêm một bước convolution và một gate. Vì vậy trong repo nhóm, dùng `order = 2` là lựa chọn cân bằng: đủ để minh họa Hyena hierarchy, nhưng vẫn nhỏ để train được."
-
-**Câu chốt ngắn:**
-
-> `N` càng lớn thì operator càng linh hoạt, nhưng chi phí cũng tăng theo.
+Câu chốt là: hierarchy không phải là một chứng minh phức tạp cần đi sâu, mà là ý rằng mỗi order thêm một tầng xử lý có cấu trúc."
 
 **Câu chuyển sang slide 24/38:**
 
-"Đến đây là xong phần cơ chế cốt lõi. Tiếp theo mình chuyển sang cách hiện thực Hyena hiệu quả và kết quả paper gốc."
+"Đến đây là xong phần cơ chế cốt lõi; tiếp theo là cách hiện thực hiệu quả và kết quả paper gốc."
 
 ---
 
@@ -390,13 +331,13 @@ Tuy nhiên, mỗi lần tăng order là thêm chi phí, vì phải thêm một b
 
 **Mục tiêu slide:** Chuyển từ cơ chế sang implementation view và kết quả thực nghiệm paper.
 
-**Lời thoại rất ngắn gợi ý:**
+**Lời thoại theo thứ tự trên slide:**
 
-"Phần vừa rồi trả lời Hyena hoạt động như thế nào. Phần tiếp theo sẽ trả lời hai câu hỏi còn lại: vì sao nó tính được rẻ hơn, và paper gốc đã chứng minh hiệu quả đó ra sao."
+"Phần vừa rồi trả lời Hyena hoạt động như thế nào. Phần tiếp theo trả lời hai câu hỏi còn lại: vì sao nó tính được rẻ hơn khi chuỗi dài, và paper gốc báo cáo kết quả đó ra sao."
 
 **Câu chuyển sang slide 25/38:**
 
-"Trước hết là một góc nhìn khá quan trọng về mặt cấu trúc ma trận."
+"Trước hết là góc nhìn operator có cấu trúc, để thấy Hyena khác attention ở cách tổ chức phép tính."
 
 ---
 
@@ -404,52 +345,49 @@ Tuy nhiên, mỗi lần tăng order là thêm chi phí, vì phải thêm một b
 
 **Mục tiêu slide:** Biến phần toán học thành trực giác dễ hiểu.
 
-**Cách đọc khi nói:**
+**Lời thoại theo thứ tự trên slide:**
 
-- `Toeplitz`: nên nói là "ma trận tích chập có cấu trúc lặp"
-- `diagonal`: nên nói là "ma trận đường chéo"
-- `L x L`: nên nói là "L nhân L"
-- `dense matrix`: nên nói là "ma trận dày đặc"
+"Slide này nhìn Hyena như một operator có cấu trúc, thay vì một ma trận attention dense.
 
-**Lời thoại gợi ý:**
+**1. Phần bảng mapping sang dạng ma trận**
 
-"Slide này nhìn hơi toán học, nhưng trực giác lại khá rõ.
+Trước hết, có hai thành phần chính cần map sang dạng ma trận.
 
-Một phép gating element-wise có thể xem như nhân với một **ma trận đường chéo**, vì mỗi vị trí chỉ nhân với hệ số của chính nó.
+Thành phần thứ nhất là gating `x^n`. Vì gating là nhân element-wise, tức nhân từng vị trí và từng channel tương ứng, nên nếu viết dưới dạng ma trận thì nó giống một diagonal matrix `D_x`, tức ma trận đường chéo. Trực giác là mỗi vị trí chỉ được nhân với hệ số gate của chính nó.
 
-Còn một phép convolution với cùng filter trượt qua chuỗi có thể xem như nhân với một **ma trận Toeplitz**, tức là ma trận có cấu trúc lặp theo đường chéo.
+Thành phần thứ hai là convolution `h^n * z^n`. Nếu viết convolution dưới dạng phép nhân ma trận, nó tương ứng với Toeplitz matrix `S_h`, tức ma trận có cấu trúc lặp theo đường chéo. Trực giác là cùng một filter `h` được trượt qua toàn bộ chuỗi.
 
-Vì vậy, toàn bộ Hyena có thể được nhìn như sự xen kẽ giữa các ma trận đường chéo và các ma trận Toeplitz. Điều quan trọng là cả hai loại ma trận này đều có cấu trúc đặc biệt, nên rẻ hơn nhiều so với một ma trận dense `L x L` như attention.
+**2. Phần box ý chính**
 
-Nói gọn lại, thay vì materialize một attention matrix rất lớn, Hyena dùng một phân rã có cấu trúc nhưng vẫn phụ thuộc dữ liệu thông qua các gate."
+Câu quan trọng là: Hyena xen kẽ `D_x` và `S_h`, thay vì tạo một attention matrix dense `L x L`. Nghĩa là Hyena vẫn có gating phụ thuộc input, nhưng phần trộn chuỗi dùng cấu trúc convolution để tính rẻ hơn.
 
-**Đoạn nói công thức trên slide:**
+**3. Phần công thức Attention**
 
-"Dòng trên slide có thể đọc như sau:
+**Tên công thức attention:** Matrix view of attention - góc nhìn ma trận của attention.
 
-`Attention: y = A(x) · v`
+**Cách đọc:** `y = A(x) · v` đọc là: `y`, tức output, bằng `A(x)`, tức ma trận attention phụ thuộc input `x`, nhân với `v`, tức value stream.
 
-Nghĩa là attention tạo một ma trận `A` phụ thuộc vào input, rồi dùng nó để trộn các giá trị `v`. Ma trận này là `L x L`, nên rất đắt khi `L` lớn.
+**Giải thích:** Vế trái `y` là output sau khi trộn thông tin. Vế phải có `A(x)` là ma trận attention được tạo từ input `x`, và `v` là các value cần được trộn. Dấu `·` là phép nhân ma trận. Vấn đề là `A(x)` có kích thước `L x L`, nên rất tốn khi `L` lớn.
 
-Còn Hyena có dạng trực giác:
+**Ý nghĩa:** Attention trộn thông tin linh hoạt vì ma trận phụ thuộc input, nhưng đổi lại phải trả chi phí lớn cho ma trận dense theo độ dài chuỗi.
 
-`Hyena: y ≈ D_x2 · S_h2 · D_x1 · S_h1 · v`
+**4. Phần công thức Hyena**
 
-Ở đây `S_h` là phép convolution, tức phần trộn thông tin có cấu trúc. `D_x` là gate, tức phần nhân theo từng vị trí hoặc channel. Hai loại này xen kẽ nhau.
+**Tên công thức Hyena:** Matrix view of Hyena operator - góc nhìn ma trận của toán tử Hyena.
 
-Ý quan trọng là Hyena vẫn tạo được một operator phụ thuộc input nhờ các `D_x`, nhưng không cần tạo một ma trận dense `L x L` như attention."
+**Cách đọc:** `Hyena: y ≈ D_x2 · S_h2 · D_x1 · S_h1 · v` đọc là: output `y` của Hyena xấp xỉ bằng chuỗi phép nhân gồm `D_x2`, `S_h2`, `D_x1`, `S_h1`, rồi áp lên value `v`. Trong đó `D_x` là gating, còn `S_h` là convolution.
 
-**Đoạn nói box trên slide:**
+**Giải thích:** Vế trái `y` là output. Vế phải đọc từ phải sang trái khi hiểu phép nhân ma trận: bắt đầu từ `v`, đi qua `S_h1` là convolution thứ nhất, rồi `D_x1` là gate thứ nhất, tiếp theo `S_h2` là convolution thứ hai, rồi `D_x2` là gate thứ hai. `D_x` là ma trận đường chéo sinh từ gate, nên nó lọc tín hiệu theo input. `S_h` là ma trận Toeplitz sinh từ convolution filter, nên nó trộn thông tin theo cấu trúc convolution. Dấu `≈` nhấn mạnh đây là góc nhìn trực giác dạng ma trận, không phải Hyena đang tạo lại attention matrix.
 
-"Box trên slide là câu chốt của matrix view: Hyena không tạo trực tiếp một attention matrix dày `L x L`. Thay vào đó, nó xen kẽ hai loại ma trận có cấu trúc: `D_x` từ gating và `S_h` từ convolution. Nhờ vậy operator vẫn phụ thuộc input, nhưng cách tính rẻ hơn vì tận dụng cấu trúc."
+**Ý nghĩa:** Hyena vẫn có operator phụ thuộc dữ liệu nhờ các gate `D_x`, nhưng không cần tạo ma trận attention dense `L x L`; nó dùng các khối có cấu trúc rẻ hơn.
 
-**Cách đơn giản hóa nếu khán giả không thích toán:**
+**5. Phần chốt ý**
 
-"Attention dùng một ma trận lớn, còn Hyena dùng nhiều khối có cấu trúc rẻ hơn để tạo hiệu ứng tổng hợp thông tin."
+Câu chốt của slide này là: Attention dùng một ma trận lớn để trộn mọi cặp token; Hyena thay bằng chuỗi diagonal matrix và Toeplitz matrix xen kẽ, nên vẫn giữ được data control nhưng tận dụng cấu trúc để giảm chi phí."
 
 **Câu chuyển sang slide 26/38:**
 
-"Tuy nhiên, vẫn còn một câu hỏi: filter dài bằng cả sequence thì học nó như thế nào mà không làm số tham số phình ra?"
+"Nhưng nếu filter dài bằng cả sequence, ta cần học filter đó như thế nào để số tham số không phình theo `L`?"
 
 ---
 
@@ -457,56 +395,49 @@ Còn Hyena có dạng trực giác:
 
 **Mục tiêu slide:** Giải thích vì sao filter dài nhưng số tham số không tăng theo `L`.
 
-**Cách đọc khi nói:**
+**Lời thoại theo thứ tự trên slide:**
 
-- `h_t = Window(t) * FFN(PositionalEncoding(t))`
-  nên nói là: "giá trị filter tại vị trí t được tạo bằng cách lấy mã hóa vị trí đưa qua một mạng truyền thẳng, rồi nhân với một hàm cửa sổ"
-- `h_t`: nên nói là "giá trị filter tại vị trí t"
-- `FFN`: nên nói là "mạng truyền thẳng"; đây là mạng neural, không phải FFT
-- `PositionalEncoding(t)`: nên nói là "mã hóa vị trí tại t"
-- `L`: nên nói là "độ dài chuỗi"
+"Slide này trả lời câu hỏi: filter dài thì học bằng cách nào?
 
-**Lời thoại gợi ý:**
+Ý chính là Hyena không lưu trực tiếp toàn bộ filter dài như một vector tham số. Thay vào đó, nó học một hàm nhỏ để sinh filter từ vị trí.
 
-"Đây là một trong những ý tưởng rất hay của Hyena. Nếu ta học trực tiếp một vector filter `h` có độ dài `L`, thì khi `L` tăng, số tham số cũng tăng theo. Điều này không thuận lợi cho long-context.
+**1. Phần công thức**
 
-Hyena tránh cách đó bằng **implicit filter**. Thay vì lưu sẵn mọi phần tử của filter, mô hình học một hàm nhỏ để sinh filter theo từng vị trí:
+**Tên công thức:** Implicit filter parametrization - cách tham số hóa filter ngầm, hay cách sinh filter gián tiếp.
 
-`h_t = Window(t) * FFN(PositionalEncoding(t))`
+**Cách đọc:** `h_t = Window(t) * FFN(PositionalEncoding(t))` đọc là: `h_t`, tức giá trị filter tại vị trí `t`, bằng `Window(t)`, tức hàm cửa sổ tại vị trí `t`, nhân với `FFN(PositionalEncoding(t))`, tức kết quả của FFN sau khi nhận positional encoding của `t`.
 
-Nói dễ hiểu hơn: với mỗi khoảng cách `t`, positional encoding giống như cách ta đưa thông tin "đây là vị trí bao xa" vào mô hình. FFN nhỏ sẽ học trả lời câu hỏi: ở khoảng cách này, tín hiệu nên đi qua mạnh hay yếu? Kết quả đó chính là giá trị filter `h_t`. Còn `Window(t)` giống như một lớp kiểm soát thêm, giúp tín hiệu ở các khoảng cách xa không dao động quá mạnh và làm filter ổn định hơn.
+**Giải thích:** `h_t` là giá trị filter ở khoảng cách `t`. Có thể hiểu là: nếu một token cách token hiện tại `t` bước, thì `h_t` cho biết tín hiệu từ khoảng cách đó nên ảnh hưởng mạnh hay yếu.
 
-Chỗ này cần phân biệt rõ: `FFN` là mạng neural dùng để **sinh filter**. Nó không phải `FFT`. `FFT` sẽ xuất hiện ở slide sau để **tính convolution nhanh**.
+Ở vế phải, `PositionalEncoding(t)` trước hết biến con số vị trí `t` thành một biểu diễn mà mạng neural hiểu được. Sau đó ta đưa biểu diễn vị trí này qua `FFN` để dự đoán một giá trị filter ban đầu. Cuối cùng `Window(t)` nhân vào như một hệ số điều chỉnh, thường để làm tín hiệu ở xa giảm mượt hơn và giúp filter ổn định hơn.
 
-Điểm quan trọng là số tham số của FFN không tăng trực tiếp theo sequence length. Nghĩa là ta có thể sinh filter rất dài mà không cần lưu một vector tham số dài tương ứng.
+**Ý nghĩa:** Hyena không học một vector filter dài bằng cách lưu từng phần tử riêng. Nó học một hàm sinh filter: đưa vị trí vào thì sinh ra giá trị filter tương ứng.
 
-Trong code của nhóm, phần này nằm ở lớp `HyenaFilter`, nơi positional encoding đi qua FFN rồi được nhân với decay window."
+Ở slide này chỉ cần nói `FFN` là mạng feed-forward nhỏ, tức mạng truyền thẳng nhỏ, dùng để sinh giá trị filter từ vị trí.
 
-**Đoạn nói công thức/ví dụ trên slide:**
+**2. Phần bảng so sánh explicit và implicit**
 
-"Công thức trên slide là:
+Với dòng explicit, ta lưu trực tiếp một vector `h[0...L-1]`. Cụm này đọc là: vector filter `h` gồm các phần tử từ `h0` đến `h_(L-1)`, tức là có khoảng `L` giá trị filter. Vì vậy nếu sequence length `L` tăng, filter cũng dài hơn và số tham số dễ tăng theo.
 
-`h_t = Window(t) * FFN(PositionalEncoding(t))`
+Với dòng implicit, ta không lưu từng giá trị filter riêng. Thay vào đó, mô hình học một hàm sinh `h_t` từ vị trí `t`. Vì tham số nằm trong FFN nhỏ, nên số tham số chính không tăng theo từng vị trí của filter.
 
-Mình đọc chậm là: giá trị filter tại vị trí `t` được sinh bằng cách lấy mã hóa vị trí `t`, đưa qua một mạng feed-forward, rồi nhân với một hàm window.
+Nếu cần nói ví dụ số, `4096` và `8192` ở đây là độ dài chuỗi, tức 4096 token hoặc 8192 token. Ý là: khi cần filter cho chuỗi dài 4096 hoặc 8192 token, Hyena có thể đưa các vị trí từ `0` đến `L-1` vào hàm sinh filter để tạo ra đủ giá trị, thay vì học riêng một tham số cho từng vị trí.
 
-Ví dụ nếu cần filter dài 4096, ta đưa các vị trí từ 0 đến 4095 vào hàm này để sinh ra 4096 giá trị filter. Nếu cần filter dài hơn, ví dụ 8192, ta tiếp tục lấy thêm các vị trí đến 8191. Tham số học vẫn nằm trong FFN, không phải mỗi vị trí có một tham số riêng.
+**3. Phần pipeline sinh filter**
 
-Vì vậy implicit filter giống như học một công thức sinh filter, thay vì học một bảng filter cố định."
+Bắt đầu từ position `t`, tức vị trí hoặc khoảng cách đang cần sinh filter. Sau đó đưa `t` qua positional encoding để biến vị trí này thành biểu diễn mà mô hình hiểu được. Biểu diễn đó đi qua small FFN, đọc là mạng feed-forward nhỏ, để tạo ra raw filter value, tức giá trị filter ban đầu. Cuối cùng raw value được nhân với `Window(t)` để ra giá trị filter cuối cùng `h_t`.
 
-**Đoạn nói bảng và pipeline trên slide:**
+**4. Phần window/decay**
 
-"Bảng trên slide so sánh hai cách học filter. Nếu explicit thì ta lưu trực tiếp `h[0...L-1]`; khi muốn filter dài hơn, số tham số cũng dễ tăng theo. Còn implicit thì tham số nằm trong FFN, FFN nhận vị trí `t` rồi sinh ra `h_t`.
+`Window(t)` giúp kiểm soát filter ở các khoảng cách xa, tránh việc giá trị filter dao động quá mạnh và làm quá trình học kém ổn định.
 
-Pipeline bên dưới đọc theo thứ tự: lấy position `t`, đưa qua positional encoding, qua small FFN để ra raw filter value, rồi nhân với `Window(t)` để ra giá trị filter cuối cùng. `Window` ở đây giúp filter ổn định hơn, đặc biệt ở các khoảng cách xa."
+Câu chốt là: Hyena học quy luật sinh filter, không học từng phần tử filter một cách explicit."
 
-**Câu chốt nên nhấn:**
-
-> Hyena học "quy luật sinh filter", không học từng phần tử filter một cách explicit.
+**Ghi chú phụ nếu bị hỏi FFN có phải FFT không:** Không. `FFN` là mạng feed-forward dùng để sinh filter ở slide 26. `FFT` là biến đổi Fourier nhanh dùng để tính convolution nhanh ở slide 27.
 
 **Câu chuyển sang slide 27/38:**
 
-"Sau khi đã có filter dài, bước tiếp theo là làm thế nào tính convolution đủ nhanh."
+"Sau khi đã sinh được filter dài, bước tiếp theo là tính convolution dài đó sao cho nhanh."
 
 ---
 
@@ -514,64 +445,39 @@ Pipeline bên dưới đọc theo thứ tự: lấy position `t`, đưa qua posi
 
 **Mục tiêu slide:** Giải thích vì sao convolution dài có thể rơi về `O(L log L)`.
 
-**Cách đọc khi nói:**
+**Lời thoại theo thứ tự trên slide:**
 
-- `FFTConv`: nên nói là "tích chập được tính bằng biến đổi Fourier nhanh"
-- `FFT`: nên nói là "biến đổi Fourier nhanh"; đây là phép biến đổi toán học, không phải FFN
-- `inverse FFT`: nên nói là "biến đổi Fourier ngược"
-- `O(L log L)`: nên nói là "độ phức tạp cỡ L log L"
+"Slide này giải thích vì sao long convolution của Hyena vẫn tính được nhanh.
 
-**Lời thoại gợi ý:**
+**1. Phần ý tưởng chính**
 
-"Nếu tính long convolution trực tiếp trong miền thời gian, chi phí sẽ rất đắt. Hyena dùng FFT để giải quyết việc này.
+Nếu tính convolution trực tiếp trong miền thời gian, tại mỗi vị trí output ta phải lấy một tổng dài của nhiều token quá khứ. Một output đã tốn nhiều phép nhân cộng; có `L` output thì chi phí gần bậc hai theo `L`.
 
-Ở slide trước, `FFN` là mạng neural để sinh filter. Còn ở slide này, `FFT` là thuật toán toán học để lấy filter đó và signal đang xử lý, rồi tính convolution nhanh hơn.
+Hyena dùng FFTConv để tránh cách tính trực tiếp này. `FFT` là Fast Fourier Transform, đọc là biến đổi Fourier nhanh.
 
-Theo convolution theorem, convolution trong miền thời gian tương đương với phép nhân từng phần tử trong miền tần số. Vì vậy quy trình là:
+Ý tưởng trong box là: thay vì tính convolution trực tiếp trong miền thời gian, ta chuyển signal và filter sang miền tần số. Trong miền tần số, phép convolution có thể được tính bằng phép nhân element-wise, tức nhân từng phần tử tương ứng. Sau đó dùng iFFT để đổi kết quả quay lại miền thời gian.
 
-1. Lấy FFT của signal và filter.
-2. Nhân chúng element-wise trong frequency domain.
-3. Dùng inverse FFT để quay lại miền thời gian.
+**2. Phần pipeline FFTConv**
 
-Nhờ vậy, chi phí giảm xuống còn `O(L log L)` thay vì dạng bậc hai theo `L`.
+Bước 1, lấy `FFT` của filter và `FFT` của signal. `FFT` đọc là "ép ép ti", viết tắt của Fast Fourier Transform, tiếng Việt là biến đổi Fourier nhanh. Signal ở đây là chuỗi hoặc trạng thái đang được convolution, ví dụ `z(n)` trong Hyena recurrence. Filter là `h(n)`. Sau bước FFT, cả signal và filter được chuyển từ miền thời gian sang miền tần số. Có thể hiểu đơn giản là ta đổi cách biểu diễn dữ liệu để convolution dễ tính hơn.
 
-Trong implementation của nhóm, phần này nằm ở hàm `_causal_fft_conv` trong `models/hyena.py`. Hàm đó dùng zero-padding để bảo toàn linear convolution, sau đó crop lại để giữ tính causal, nghĩa là mỗi token chỉ nhìn về quá khứ."
+Bước 2, nhân hai kết quả FFT này element-wise trong frequency domain, tức miền tần số. Nghĩa là phần tử thứ nhất của FFT(signal) nhân với phần tử thứ nhất của FFT(filter), phần tử thứ hai nhân với phần tử thứ hai, và cứ như vậy. Đây là điểm giúp tính nhanh, vì thay vì trượt filter dài qua chuỗi, ta chỉ nhân từng cặp phần tử tương ứng trong miền tần số.
 
-**Đoạn nói các box trên slide:**
+Bước 3, dùng biến đổi Fourier ngược, ký hiệu là `iFFT`, để chuyển kết quả từ miền tần số quay lại miền thời gian. `iFFT` đọc là "ai ép ép ti", nghĩa là inverse FFT. Output sau biến đổi Fourier ngược chính là kết quả convolution trên sequence, tức tín hiệu đã được trộn thông tin theo filter dài.
 
-"Box đầu tiên là trực giác chính: đổi miền tính toán để convolution trở thành phép nhân element-wise. Pipeline ở giữa là ba bước thực hiện: FFT signal và filter, nhân trong miền tần số, rồi iFFT để quay lại chuỗi output.
+**3. Phần so sánh chi phí**
 
-Hai box cuối slide là so sánh chi phí. Direct convolution không phù hợp khi filter rất dài vì phải trượt filter và cộng nhiều lần. FFTConv có overhead, nhưng khi `L` lớn thì chi phí `O(L log L)` tốt hơn nhiều so với cách tính trực tiếp."
+Direct convolution nghĩa là tính convolution trực tiếp bằng cách trượt filter dài qua toàn chuỗi. Cách này đắt khi filter rất dài, nên ít phù hợp với long-context.
 
-**Nếu thầy hỏi chi tiết causal FFT trong paper:**
+FFTConv có chi phí khoảng `O(L log L)`. Ở đây `L` là độ dài chuỗi. Khi `L` lớn, `L log L` tăng chậm hơn nhiều so với `L^2`, nên FFTConv có lợi hơn cho context dài.
 
-"Paper nói để bảo toàn causality, chỉ cần evaluate filter ở các vị trí `0` đến `L-1`, rồi zero-pad input và filter lên khoảng `2L-1` trước khi FFT. Sau khi iFFT thì lấy lại phần độ dài `L`. Ý chính là tránh circular convolution làm token hiện tại bị lẫn thông tin tương lai."
+Nếu thầy hỏi chi tiết implementation, trong repo nhóm phần này nằm ở hàm `_causal_fft_conv` trong `models/hyena.py`. Hàm có zero-padding trước khi FFT để tránh circular convolution làm lẫn thông tin tương lai, rồi crop lại độ dài `L` để giữ causal convolution."
 
-**Đoạn nói công thức/ví dụ trên slide:**
-
-"Mình có thể giải thích chậm hơn như sau. Nếu tính trực tiếp convolution dài, tại mỗi vị trí output ta phải tính một tổng dài:
-
-`y_t = h_0*x_t + h_1*x_(t-1) + h_2*x_(t-2) + ...`
-
-Một output cần khoảng `L` phép nhân cộng. Có `L` output, nên tổng gần `O(L^2)`.
-
-FFTConv dùng convolution theorem:
-
-`FFT(x * h) = FFT(x) * FFT(h)`
-
-Điểm mấu chốt là vế phải chỉ là nhân element-wise. Tức là sau khi đổi input và filter sang frequency domain, ta không trượt filter nữa, mà chỉ nhân từng cặp phần tử:
-
-`Y_0 = X_0 * H_0`, `Y_1 = X_1 * H_1`, ...
-
-Sau đó dùng inverse FFT để quay lại sequence output. Vì FFT và inverse FFT tốn `O(L log L)`, nên tổng chi phí convolution dài giảm từ gần `O(L^2)` xuống `O(L log L)`."
-
-**Điểm thực tế nên thêm:**
-
-"Repo của nhóm dùng PyTorch FFT thuần để minh họa đúng cơ chế. Vì vậy nó đủ để thấy xu hướng, nhưng chưa phải implementation tối ưu như các kernel CUDA trong paper."
+**Ghi chú phụ nếu thầy hỏi cơ sở toán:** Ý này dựa trên convolution theorem, tức định lý tích chập: convolution trong miền thời gian tương đương với nhân từng phần tử trong miền tần số. Slide không cần đọc công thức này, chỉ cần nói trực giác đổi miền để tính nhanh hơn.
 
 **Câu chuyển sang slide 28/38:**
 
-"Từ đây, ta mới thấy rõ vì sao Hyena hấp dẫn trong bài toán long-context."
+"Từ đó mình có thể chốt lại complexity và ý nghĩa thực tế của Hyena."
 
 ---
 
@@ -579,44 +485,51 @@ Sau đó dùng inverse FFT để quay lại sequence output. Vì FFT và inverse
 
 **Mục tiêu slide:** Chốt lợi thế tính toán và nói rõ điều kiện lợi thế này phát huy.
 
-**Cách đọc khi nói:**
+**Lời thoại theo thứ tự trên slide:**
 
-- `O(L^2)`: nên nói là "độ phức tạp bậc hai theo độ dài chuỗi"
-- `O(N * L log L)`: nên nói là "độ phức tạp cỡ N nhân L log L"
-- `FlashAttention`: nên nói là "FlashAttention, một cách tối ưu attention"
-- `8K`, `16K`, `64K`: nên nói là "tám nghìn", "mười sáu nghìn", "sáu mươi bốn nghìn token"
+"Slide này chốt lại complexity theo sequence length.
 
-**Lời thoại gợi ý:**
+**1. Phần bảng complexity**
 
-"Với attention chuẩn, thời gian và bộ nhớ đều bị ảnh hưởng mạnh bởi ma trận `L x L`, nên thường được mô tả ở mức `O(L^2)`.
+Với Standard Attention, mỗi token phải so với rất nhiều token khác trong chuỗi. Vì vậy khi độ dài chuỗi là `L`, số cặp cần xử lý tăng theo `L^2`, và mô hình thường phải tạo một ma trận kích thước `L x L`.
 
-Trong khi đó, nếu nhìn theo chiều sequence và coi width là cố định, Hyena có chi phí xấp xỉ `O(N * L log L)`, với `N` là order của recurrence. Paper viết đầy đủ hơn là `O(N * D * L * (log L + D))`, trong đó `D` là model width. Khi tập trung so với attention theo `L`, điểm chính vẫn là `L log L` tăng chậm hơn rất nhiều so với `L^2`.
+FlashAttention vẫn có cùng bậc `O(L^2)` về số phép tính, nhưng nó sắp xếp cách tính thông minh hơn để giảm truy cập bộ nhớ. Vì vậy trong thực tế FlashAttention chạy nhanh và tiết kiệm bộ nhớ hơn attention thường, dù bản chất vẫn là attention.
 
-Ý nghĩa thực tế là Hyena đặc biệt phù hợp khi ta muốn mở rộng lên chuỗi rất dài, ví dụ 8K, 16K, 64K token hoặc hơn.
+Với Hyena, chi phí tính toán theo độ dài chuỗi là khoảng `O(N * L log L)`. Điểm quan trọng là Hyena không cần tạo ma trận attention.
 
-Tuy nhiên, mình cũng cần nói công bằng rằng ở sequence ngắn, Hyena chưa chắc nhanh hơn. FFT có overhead, và nếu implementation chưa tối ưu thì attention hoặc FlashAttention vẫn có thể thắng ở vùng ngắn. Vì vậy lợi thế của Hyena không phải ở mọi chế độ, mà chủ yếu xuất hiện rõ trong long-context."
+**2. Phần công thức Hyena**
 
-**Đoạn nói bảng trên slide:**
+**Tên công thức complexity:** Sequence-length complexity - chi phí theo độ dài chuỗi.
 
-"Bảng này nên đọc theo cột `Compute theo L`. Standard Attention là `O(L^2)` vì phải xét các cặp token và tạo ma trận `L x L`. FlashAttention vẫn là `O(L^2)` về compute, nhưng tối ưu IO và memory access nên chạy nhanh hơn attention thường. Hyena khác ở chỗ không tạo attention matrix; chi phí theo `L` là khoảng `O(N * L log L)`, với `N` là số bước recurrence và thường chọn nhỏ."
+**Cách đọc:** `O(N * L log L)` đọc là: chi phí tính toán của Hyena tăng cỡ `N` nhân `L log L` khi độ dài chuỗi tăng.
 
-**Đoạn nói box trên slide:**
+**Giải thích:** Big-O không phải số phép tính chính xác, mà là cách mô tả chi phí tăng nhanh thế nào khi `L` tăng. Trong công thức này, `L` là độ dài chuỗi, `log L` đến từ chi phí FFT, còn `N` là số bước recurrence hay order của Hyena. Dấu nhân nghĩa là nếu có `N` bước recurrence thì chi phí convolution nhanh được lặp khoảng `N` lần. Vì mỗi bước cần một convolution dài bằng FFT, nên chi phí theo `L` được ghi gọn là `O(N * L log L)`.
 
-"Box ở giữa là ý cần chốt: khi `L` càng lớn, `L log L` tăng chậm hơn `L^2`, nên lợi thế của Hyena chỉ thật sự rõ ở long-context. Vì vậy không nên nói Hyena luôn nhanh hơn, mà nên nói Hyena có điểm rơi ở chuỗi dài."
+**Ý nghĩa:** Hyena khác attention ở chỗ không tạo attention matrix. Attention tăng theo `L^2`, còn Hyena tăng gần `L log L` theo chiều dài chuỗi, nên lợi thế rõ hơn khi `L` rất lớn.
 
-**Đoạn nói ví dụ số trên slide:**
+**3. Phần dòng ghi chú về N và công thức đầy đủ của Hyena operator**
 
-"Nếu muốn làm rõ trực giác tăng trưởng, có thể lấy ví dụ rất đơn giản. Khi `L` tăng gấp đôi, attention dạng `L^2` có xu hướng tăng khoảng bốn lần về số cặp token cần xét. Còn `L log L` tăng chậm hơn nhiều, gần với tuyến tính hơn.
+Trong Hyena, `N` là order hoặc số bước recurrence, thường được chọn nhỏ. Ví dụ repo nhóm dùng `order = 2`, tức mỗi block lặp hai bước convolution cộng gating.
 
-Đó là lý do ở sequence ngắn, overhead FFT có thể làm Hyena chưa thắng. Nhưng khi context dài lên, phần `L^2` của attention phình rất nhanh, còn Hyena tăng chậm hơn."
+Ngay dưới đó, slide có thêm công thức đầy đủ hơn cho **độ phức tạp tính toán của Hyena operator** trong paper: `O(N * D * L * (log L + D))`.
 
-**Câu nên nói rất rõ để tránh hiểu nhầm:**
+**Tên công thức:** Hyena operator compute complexity - độ phức tạp tính toán của Hyena operator.
 
-> Subquadratic không có nghĩa là luôn nhanh hơn trong mọi setting; nó có lợi thế rõ nhất khi `L` đủ lớn.
+**Cách đọc:** đọc là: chi phí tăng theo `N`, nhân với `D`, nhân với `L`, rồi nhân với phần trong ngoặc là `log L + D`.
+
+**Giải thích:** Trong đó, `N` là số bước recurrence, `D` là model width, tức độ rộng biểu diễn của mô hình, và `L` là độ dài chuỗi. Trên bảng chính, mình rút gọn còn `O(N * L log L)` để nhấn vào điểm đang so sánh với attention: khi sequence length `L` tăng, Hyena tăng chậm hơn attention theo `L`.
+
+**4. Phần box ý nghĩa**
+
+Ý cần nhớ là: khi `L` rất lớn, `L log L` tăng chậm hơn `L^2`, nên lợi thế của Hyena rõ nhất ở long-context.
+
+**5. Phần lưu ý cuối**
+
+Cũng cần nói công bằng rằng Hyena không nhất thiết nhanh hơn ở `L` nhỏ vì FFT có overhead. Vì vậy slide này không nói Hyena luôn nhanh hơn, mà nói lợi thế rõ nhất khi context đủ dài."
 
 **Câu chuyển sang slide 29/38:**
 
-"Vậy paper gốc đã chứng minh lợi thế này bằng thực nghiệm như thế nào?"
+"Vậy paper gốc báo cáo kết quả thực nghiệm như thế nào?"
 
 ---
 
@@ -624,40 +537,43 @@ Tuy nhiên, mình cũng cần nói công bằng rằng ở sequence ngắn, Hyen
 
 **Mục tiêu slide:** Tóm tắt kết quả đủ tự tin nhưng không lẫn với kết quả nhóm.
 
-**Cách đọc khi nói:**
+**Lời thoại theo thứ tự trên slide:**
 
-- `WikiText-103`: nên nói là "bộ dữ liệu WikiText một không ba"
-- `The Pile`: nên nói là "bộ dữ liệu The Pile"
-- `8K`, `64K`: nên nói là "tám nghìn", "sáu mươi bốn nghìn"
-- `FlashAttention`: nên nói là "FlashAttention"
+"Slide này chỉ nói về kết quả của paper gốc, chưa phải kết quả reproduction của nhóm.
 
-**Lời thoại gợi ý:**
+**1. Phần quality**
 
-"Ở slide cuối phần method, mình chỉ chốt lại các kết quả chính của paper gốc.
+Phần quality đọc theo từng benchmark.
 
-Trên các benchmark language modeling như WikiText-103 và The Pile, Hyena cho thấy chất lượng rất gần Transformer, và trong một số setting có thể match baseline attention ở cùng quy mô tham số.
+Với dataset WikiText-103, paper báo cáo Hyena-3 có chất lượng gần Transformer 125M. Kết quả này nằm ở **Table 7 trong Appendix A.2, trang PDF 16** của paper, phần perplexity trên WikiText-103. Ở đây `125M` đọc là 125 triệu tham số, tức quy mô mô hình.
 
-Ngoài chất lượng, điểm nổi bật hơn là hiệu năng trên long-context. Paper benchmark Hyena order 2 với fused CUDA FFTConv. Ở độ dài khoảng 8192 token, Hyena nhanh hơn khoảng 5 lần so với attention thường và khoảng 2 lần so với FlashAttention. Ở 64K token, paper báo cáo mức nhanh hơn khoảng 100 lần so với FlashAttention.
+Với dataset The Pile, paper báo cáo kết quả của Hyena-2 ở quy mô 335M. Kết quả này nằm ở **Table 3 trong Section 4.2 - Language Modeling, trang PDF 8**, phần perplexity trên The Pile. `335M` đọc là 335 triệu tham số. Ở đây chỉ cần nhấn vào ý chính: Hyena-2 cạnh tranh tốt ở cùng quy mô mô hình; mình không cần đi sâu vào mô hình baseline.
 
-Paper cũng nói điểm giao không xuất hiện ngay ở chuỗi ngắn: Hyena bắt đầu vượt attention quanh 2048 token, và vượt FlashAttention ở khoảng 4096 đến 8192 token. Điều này quan trọng vì nó cho thấy Hyena không chỉ là một ý tưởng lý thuyết, mà có lợi thế thực nghiệm rõ khi context đủ dài."
+Với associative recall, paper cho thấy Hyena giữ chất lượng ở chuỗi rất dài, từ `30K` đến `131K` token, trong khi nhiều baseline bị `OOM`. Kết quả này nằm ở **Table 2 trong Section 4.1, trang PDF 8**, phần associative recall trên sequence dài. `OOM` là out of memory, tức không đủ bộ nhớ để chạy.
 
-**Đoạn nói bảng/kết quả trên slide:**
+Ý của phần quality là: Hyena không chỉ nhắm tới tốc độ ở long-context, mà chất lượng cũng đủ cạnh tranh trong các benchmark paper báo cáo.
 
-"Khi đọc bảng, mình không cần đi vào toàn bộ số chi tiết. Mình nên gom thành hai ý.
+**2. Phần efficiency**
 
-Ý thứ nhất là quality, tương ứng bảng bên trái. Trên WikiText-103, Hyena-3 ở 125M đạt chất lượng gần Transformer 125M. Trên The Pile 335M, Hyena-2 match GPT baseline về perplexity, với khoảng 20% giảm FLOPs ở phần attention-related compute. Với associative recall, paper cho thấy Hyena giữ được khả năng truy xuất trên chuỗi rất dài, trong khi nhiều baseline không fit vào bộ nhớ.
+Phần efficiency đọc theo từng độ dài chuỗi.
 
-Ý thứ hai là efficiency, tương ứng bảng bên phải. Ở khoảng 2K token là gần điểm giao với attention thường. Ở 8K, Hyena nhanh hơn khoảng 5 lần so với attention thường và khoảng 2 lần so với FlashAttention. Ở 64K, paper báo cáo khoảng 100 lần so với FlashAttention. Đây là phần liên hệ trực tiếp với complexity `O(N * L log L)` đã nói ở slide trước.
+Ở `2K`, tức khoảng 2 nghìn token, paper nói đây là gần vùng crossover. Crossover nghĩa là vùng bắt đầu chuyển từ attention có lợi hơn sang Hyena có lợi hơn.
 
-Nếu bị hỏi về associative recall, có thể nói đây là synthetic task kiểm tra khả năng nhớ và truy xuất thông tin ở khoảng cách rất xa. Paper dùng nó để cho thấy Hyena không chỉ học tốt language modeling thông thường, mà còn xử lý được phụ thuộc dài hạn."
+Ở `8K`, tức khoảng 8 nghìn token, Hyena nhanh hơn khoảng 5 lần so với attention thường và khoảng 2 lần so với FlashAttention.
 
-**Đoạn nói box cuối slide:**
+Ở `64K`, tức khoảng 64 nghìn token, paper báo cáo Hyena nhanh hơn khoảng 100 lần so với FlashAttention.
 
-"Box cuối slide là câu kết của phần paper gốc: Hyena vừa thu hẹp quality gap với Transformer, vừa cho thấy lợi thế rõ ở context rất dài. Sau câu này mình chuyển sang phần reproduction của nhóm, nơi nhóm kiểm chứng xu hướng ở quy mô nhỏ hơn."
+Các kết quả runtime này nằm ở **Figure 6 trong Section 4.4 - Benchmarking, trang PDF 9**. Figure 6 so sánh runtime của Hyena, Attention và FlashAttention theo nhiều sequence length khác nhau.
+
+Một chi tiết quan trọng là điểm giao không xuất hiện ngay ở chuỗi ngắn. Paper nói Hyena bắt đầu vượt attention quanh 2048 token, và vượt FlashAttention khoảng 4096 đến 8192 token. Điều này khớp với slide trước: lợi thế của Hyena rõ nhất khi context đủ dài.
+
+**3. Phần box kết luận**
+
+Câu kết của slide này là: paper gốc báo cáo Hyena vừa thu hẹp khoảng cách chất lượng với Transformer, vừa có lợi thế tốc độ rõ ràng ở long-context. Sau phần này mới chuyển sang reproduction của nhóm ở quy mô nhỏ hơn."
 
 **Câu chốt ngắn:**
 
-"Tóm lại, paper cho thấy Hyena vừa thu hẹp khoảng cách chất lượng với Transformer, vừa có lợi thế tốc độ rõ hơn khi context đủ dài."
+"Tóm lại, kết quả gốc cho thấy Hyena không chỉ là ý tưởng lý thuyết; nó có chất lượng cạnh tranh và có lợi thế rõ khi sequence length lớn."
 
 ---
 
@@ -686,6 +602,60 @@ Trả lời ngắn:
 Trả lời ngắn:
 
 > Vì repo này là reproduction nhỏ bằng PyTorch thuần, dùng `torch.fft` thay cho kernel tối ưu như paper. Mục tiêu chính là kiểm chứng cơ chế và xu hướng, không phải tái tạo throughput tuyệt đối ở quy mô công nghiệp.
+
+### Nếu bị hỏi: "Hyena khác attention ở điểm nào quan trọng nhất?"
+
+Trả lời ngắn:
+
+> Attention tạo ma trận `L x L` để so sánh các cặp token. Hyena không tạo ma trận đó, mà dùng long convolution để đưa thông tin xa về và dùng gating để chọn lọc theo input.
+
+### Nếu bị hỏi: "Long convolution có phải giống attention không?"
+
+Trả lời ngắn:
+
+> Không giống hoàn toàn. Long convolution giúp token hiện tại nhận thông tin từ quá khứ xa, nhưng cách trộn có cấu trúc theo filter. Attention thì học trọng số giữa từng cặp token. Hyena dùng thêm gate để phép trộn phụ thuộc input hơn.
+
+### Nếu bị hỏi: "Gating có phải chỉ là bật/tắt 0 và 1 không?"
+
+Trả lời ngắn:
+
+> Không. Gate là hệ số liên tục. Nó có thể giảm tín hiệu, giữ tín hiệu, hoặc cho tín hiệu đi qua mạnh hơn tùy input. Vì vậy nó giống bộ điều chỉnh cường độ hơn là công tắc bật tắt cứng.
+
+### Nếu bị hỏi: "FFN và FFT khác nhau thế nào?"
+
+Trả lời ngắn:
+
+> `FFN` là mạng feed-forward nhỏ, dùng ở slide 26 để sinh filter từ vị trí. `FFT` là biến đổi Fourier nhanh, dùng ở slide 27 để tính convolution nhanh. Nói gọn: FFN sinh filter, FFT tính convolution.
+
+### Nếu bị hỏi: "Vì sao implicit filter giúp ít tham số hơn?"
+
+Trả lời ngắn:
+
+> Vì mô hình không học riêng từng giá trị filter từ `h0` đến `h_(L-1)`. Nó học một hàm sinh filter: đưa vị trí `t` vào thì sinh ra `h_t`. Do đó khi chuỗi dài hơn, ta sinh thêm giá trị filter thay vì thêm một tham số riêng cho mỗi vị trí.
+
+### Nếu bị hỏi: "Vì sao FFTConv nhanh hơn direct convolution?"
+
+Trả lời ngắn:
+
+> Direct convolution phải trượt filter dài qua toàn chuỗi nên rất tốn khi `L` lớn. FFTConv đổi signal và filter sang miền tần số, nhân từng phần tử, rồi dùng biến đổi Fourier ngược để quay lại sequence output. Nhờ vậy chi phí tăng khoảng `L log L` thay vì gần bậc hai theo `L`.
+
+### Nếu bị hỏi: "Hyena có luôn nhanh hơn FlashAttention không?"
+
+Trả lời ngắn:
+
+> Không. Ở chuỗi ngắn, FFT có overhead nên Hyena chưa chắc nhanh hơn. Paper nhấn mạnh lợi thế của Hyena rõ nhất ở long-context, ví dụ vùng 8K token trở lên và đặc biệt 64K token.
+
+### Nếu bị hỏi: "Các kết quả slide 29 lấy ở đâu trong paper?"
+
+Trả lời ngắn:
+
+> WikiText-103 nằm ở Table 7, Appendix A.2, trang PDF 16. The Pile nằm ở Table 3, Section 4.2, trang PDF 8. Associative recall nằm ở Table 2, Section 4.1, trang PDF 8. Runtime nằm ở Figure 6, Section 4.4, trang PDF 9.
+
+### Nếu bị hỏi: "Kết quả slide 29 có phải nhóm mình reproduce không?"
+
+Trả lời ngắn:
+
+> Không. Slide 29 là kết quả paper gốc. Phần reproduction của nhóm nằm ở phần sau do Quang trình bày, với quy mô nhỏ hơn.
 
 ---
 

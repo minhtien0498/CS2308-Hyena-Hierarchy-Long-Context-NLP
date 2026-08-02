@@ -53,9 +53,13 @@ style: |
     background: linear-gradient(135deg, var(--navy), var(--accent));
   }
   ol { padding-left: 22px; } ol li { margin: 11px 0; line-height: 1.45; }
-  table { font-size: 21px; border-collapse: collapse; margin: 10px 0; width: 100%;
-    border-radius: 10px; overflow: hidden; }
+  table { font-size: 21px; border-collapse: separate; border-spacing: 0; margin: 10px 0; width: 100%;
+    border-radius: var(--card-radius); overflow: visible; }
   thead th { background: var(--navy); color: #fff; font-weight: 600; }
+  thead th:first-child { border-top-left-radius: var(--card-radius); }
+  thead th:last-child { border-top-right-radius: var(--card-radius); }
+  tbody tr:last-child td:first-child { border-bottom-left-radius: var(--card-radius); }
+  tbody tr:last-child td:last-child { border-bottom-right-radius: var(--card-radius); }
   tbody tr:nth-child(even) td { background: #f6f9fe; }
   td, th { border: 1px solid var(--line); padding: 8px 14px; }
   blockquote {
@@ -176,6 +180,13 @@ style: |
   .mono { margin:8px 0; }
   .tight table { font-size:17.5px; }
   .tight li { font-size:22px; }
+  section.compact h3 { margin-bottom:8px; }
+  section.compact .small { font-size:16px; }
+  section.compact .katex-display { padding:10px 18px; margin:8px 0 10px; }
+  section.compact table { font-size:16px; margin-top:8px; margin-bottom:10px; }
+  section.compact td, section.compact th { padding:5px 10px; }
+  section.compact .pipeline { font-size:18px; line-height:1.45; padding:9px 14px; margin-top:8px; margin-bottom:10px; }
+  section.compact .box { padding:10px 18px; margin-top:12px; margin-bottom:12px; }
   /* ── Section divider (navy + ghost number) ── */
   section.divider {
     background-color:#16294d !important;
@@ -697,7 +708,7 @@ CNN local:   token t chỉ nhận từ vùng gần     [x x x] ---- t
 Long conv:   token t có thể nhận từ rất xa phía trước    [x x x x x x x x x] t
 ```
 
-**Ý nghĩa:** long convolution giúp mô hình hóa phụ thuộc xa mà không cần ma trận attention `L x L`.
+<span class="small"><strong>Ý nghĩa:</strong> mô hình hóa phụ thuộc xa mà không cần attention matrix <code>L × L</code>.</span>
 
 <!--
 Notes:
@@ -829,7 +840,7 @@ Không cần chứng minh hierarchy; chỉ cần nắm: mỗi order thêm một 
 
 ## Matrix View
 
-### Trực giác ma trận
+### Từ attention matrix sang operator có cấu trúc
 
 | Thành phần Hyena | Dạng ma trận | Trực giác |
 |---|---|---|
@@ -857,25 +868,33 @@ Nếu thầy hỏi sâu: D_x là diagonal nên nhân rẻ; S_h có cấu trúc c
 
 ---
 
+<!-- _class: compact -->
+
 ## Implicit Filter
 
 ### Filter dài nhưng ít tham số
 
+<span class="small"><strong>Sinh filter từ vị trí <code>t</code></strong></span>
+
 $$
 h_t = \mathrm{Window}(t) \cdot \mathrm{FFN}(\mathrm{PE}(t))
 $$
+
+<span class="small"><strong>Explicit vs Implicit filter</strong></span>
 
 | Cách học filter | Ý tưởng | Vấn đề/lợi ích |
 |---|---|---|
 | Explicit | lưu trực tiếp `h[0...L-1]` | dài hơn thì thêm tham số |
 | Implicit | học hàm sinh `h_t` từ vị trí `t` | tham số nằm trong FFN |
 
+<span class="small"><strong>Pipeline sinh filter</strong></span>
+
 <div class="pipeline">
 position t -> Positional Encoding -> small FFN -> raw filter value<br>
 raw value * Window(t) -> h_t
 </div>
 
-<span class="small">Window/decay giúp filter ổn định hơn ở các khoảng cách xa.</span>
+<span class="small"><strong>Window/decay:</strong> giúp filter ổn định hơn ở các khoảng cách xa.</span>
 
 <!--
 Notes:
@@ -929,7 +948,7 @@ y = torch.fft.irfft(Y, n=fft_len, dim=-1)[..., :L]
 
 ---
 
-<!-- _class: tight -->
+<!-- _class: tight compact -->
 
 ## Complexity Và Ý Nghĩa
 
@@ -943,14 +962,17 @@ y = torch.fft.irfft(Y, n=fft_len, dim=-1)[..., :L]
 
 <span class="small">Trong Hyena, `N` là order/số bước recurrence, thường được chọn nhỏ.</span>
 
+<div class="box formula-card">
+<strong>Công thức độ phức tạp tính toán của Hyena</strong><br>
+<code>O(N · D · L · (log L + D))</code><br>
+<span class="small"><code>D</code> là model width; bảng trên nhấn mạnh chi phí theo <code>L</code>.</span>
+</div>
+
 <div class="box">
 
 Khi `L` tăng rất lớn, `L log L` tăng chậm hơn `L²`, nên lợi thế của Hyena rõ nhất ở long-context.
 
 </div>
-
-<span class="small">Lưu ý: Hyena không nhất thiết nhanh hơn ở `L` nhỏ vì FFT có overhead.</span>
-<span class="small">Giá trị của paper: vừa có novelty kiến trúc, vừa thu hẹp quality gap với Transformer ở long-context.</span>
 
 <!--
 Notes:
@@ -964,7 +986,7 @@ Minh họa số: L=1K: L^2≈1M, LlogL≈10K. L=8K: L^2≈67M, LlogL≈106K. L=6
 
 ## Kết Quả Paper Gốc
 
-### Paper chứng minh 2 thứ: quality và efficiency
+### Paper báo cáo 2 nhóm kết quả: quality và efficiency
 
 <div class="grid2">
 
@@ -976,7 +998,7 @@ Minh họa số: L=1K: L^2≈1M, LlogL≈10K. L=8K: L^2≈67M, LlogL≈106K. L=6
   </thead>
   <tbody>
     <tr><td>WikiText-103</td><td>Hyena-3 ~ Transformer 125M</td></tr>
-    <tr><td>The Pile 335M</td><td>Hyena-2 ~ GPT baseline</td></tr>
+    <tr><td>The Pile 335M</td><td>Hyena-2 cạnh tranh ở cùng quy mô</td></tr>
     <tr><td>Associative recall</td><td>giữ chất lượng ở 30K–131K, nhiều baseline OOM</td></tr>
   </tbody>
 </table>
