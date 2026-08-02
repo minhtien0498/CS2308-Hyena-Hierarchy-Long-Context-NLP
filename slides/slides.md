@@ -12,6 +12,7 @@ style: |
   :root {
     --navy:#1F3A68; --navy-deep:#16294d; --ink:#1d2b36;
     --accent:#2a6df4; --soft:#eef3fb; --line:#d4deee; --muted:#6b7a90;
+    --card-bg:#f7faff; --card-border:#cdd9ec; --card-radius:8px;
   }
   section {
     font-family: "Be Vietnam Pro", "Segoe UI", system-ui, sans-serif;
@@ -58,21 +59,21 @@ style: |
   tbody tr:nth-child(even) td { background: #f6f9fe; }
   td, th { border: 1px solid var(--line); padding: 8px 14px; }
   blockquote {
-    border: none; border-left: 5px solid var(--accent);
-    background: var(--soft); color: #20324f; padding: 12px 22px;
-    border-radius: 0 12px 12px 0; margin: 12px 0;
+    border: 1px solid var(--card-border); border-left: 5px solid var(--accent);
+    background: var(--card-bg); color: #20324f; padding: 12px 22px;
+    border-radius: var(--card-radius); margin: 12px 0;
   }
   /* ── Display math as an elegant card ── */
   .katex-display {
-    background: linear-gradient(180deg, #f7faff 0%, #eef3fb 100%);
-    border: 1px solid var(--line); border-left: 5px solid var(--navy);
-    border-radius: 12px; padding: 16px 22px; margin: 14px 0;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border); border-left: 5px solid var(--navy);
+    border-radius: var(--card-radius); padding: 16px 22px; margin: 14px 0;
   }
   .katex { font-size: 1.18em; }
   /* ── Code as a clean light card ── */
   pre {
-    background: #f7faff; border: 1px solid var(--line);
-    border-radius: 12px; padding: 14px 18px;
+    background: var(--card-bg); border: 1px solid var(--card-border);
+    border-radius: var(--card-radius); padding: 14px 18px;
   }
   pre code { background: none; color: #20324f; font-size: 19px; line-height: 1.6; }
   footer {
@@ -118,12 +119,12 @@ style: |
   /* ── Components ── */
   .small { font-size:18px; color:var(--muted); }
   .box {
-    background:#f7faff; border:1px solid var(--line); border-left:5px solid var(--accent);
-    border-radius:0 12px 12px 0; padding:13px 22px;
+    background:var(--card-bg); border:1px solid var(--card-border); border-left:5px solid var(--accent);
+    border-radius:var(--card-radius); padding:13px 22px;
   }
   .warn {
     background:#fff8ec; border:1px solid #f3dca6; border-left:5px solid #e0a51e;
-    border-radius:0 12px 12px 0; padding:13px 22px;
+    border-radius:var(--card-radius); padding:13px 22px;
   }
   .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:start; }
   .center { text-align:center; }
@@ -132,7 +133,7 @@ style: |
   /* vertical flow of steps */
   .flow { display:flex; flex-direction:column; align-items:center; gap:5px; margin:14px 0; }
   .flow .step {
-    background:#fff; border:1.5px solid #cdd9ec; border-radius:10px;
+    background:#fff; border:1.5px solid var(--card-border); border-radius:var(--card-radius);
     padding:9px 22px; font-weight:600; color:var(--navy); font-size:21px;
   }
   .flow .step.fill { background:var(--navy); color:#fff; border-color:var(--navy); }
@@ -153,7 +154,8 @@ style: |
   .mono .dim { color:#7f93bd; }
   /* monospace pipeline / step card (Tiến) */
   .pipeline {
-    background:#f7faff; border:1px solid var(--line); border-radius:12px;
+    background:var(--card-bg); border:1px solid var(--card-border); border-left:5px solid var(--accent);
+    border-radius:var(--card-radius);
     padding:12px 16px;
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     font-size:20px; line-height:1.65; color:#20324f;
@@ -168,7 +170,7 @@ style: |
   /* khoảng cách dọc giữa các block component (tránh dính nhau) */
   .box, .warn, .pipeline, .grid2, pre, table { margin-top:16px; margin-bottom:16px; }
   .mono { margin:8px 0; }
-  .tight table { font-size:18.5px; }
+  .tight table { font-size:17.5px; }
   .tight li { font-size:22px; }
   /* ── Section divider (navy + ghost number) ── */
   section.divider {
@@ -532,7 +534,7 @@ Hyena được thiết kế để **giữ đồng thời cả ba** — thay vì 
 
 <!--
 Notes:
-3 tính chất này là bản lề bàn giao sang Tiến (TV2): long convolution + gating dựng lại đúng 3 tính chất này.
+3 tính chất này là bản lề bàn giao sang Tiến: long convolution + gating dựng lại đúng 3 tính chất này.
 -->
 
 ---
@@ -770,7 +772,7 @@ Bước n:<br>
 
 <!--
 Notes:
-Slide trọng tâm nhất của TV2. Giải thích từng biến thật chậm.
+Slide trọng tâm nhất của Tiến. Giải thích từng biến thật chậm.
 Nếu bị hỏi "Hyena khác CNN ở đâu?": CNN chủ yếu conv; Hyena xen kẽ conv dài và gate phụ thuộc input nhiều bước.
 -->
 
@@ -782,7 +784,7 @@ Nếu bị hỏi "Hyena khác CNN ở đâu?": CNN chủ yếu conv; Hyena xen k
 
 - Hyena có thể lặp nhiều bước **convolution + gating**.
 - `N` càng lớn, operator càng biểu diễn phong phú hơn.
-- Các cấu trúc như H3/GSS có thể xem là liên quan ở bậc thấp.
+- H3 có thể xem như Hyena bậc 2; GSS như Hyena bậc 1 với filter SSM.
 - Trong repo nhóm: Hyena-small dùng **`order = 2`** để dễ reproduction.
 
 <div class="pipeline">
@@ -791,13 +793,10 @@ Order 2:  z1 -> Conv h1 -> Gate x1 -> z2 -> Conv h2 -> Gate x2 -> z3<br>
 Order N:  repeat N lần -> output
 </div>
 
-<div class="warn">
-Không cần chứng minh hierarchy; chỉ cần nắm: mỗi order thêm một tầng tương tác có cấu trúc.
-</div>
-
 <!--
 Notes:
 Không cần giải thích sâu H3/GSS, chỉ nói Hyena tổng quát hóa ý tưởng gating + convolution.
+Không cần chứng minh hierarchy; chỉ cần nắm: mỗi order thêm một tầng tương tác có cấu trúc.
 -->
 
 ---
@@ -908,8 +907,6 @@ Có lợi khi <code>L</code> lớn
 
 </div>
 
-<span class="small">Trong repo: `models/hyena.py -> HyenaOperator._causal_fft_conv`.</span>
-
 <!--
 Notes:
 Không cần đi sâu Fourier. Chỉ cần giải thích "đổi miền để convolution thành phép nhân".
@@ -928,11 +925,11 @@ y = torch.fft.irfft(Y, n=fft_len, dim=-1)[..., :L]
 
 ### Điểm rơi của Hyena là context dài
 
-| Method | Time | Memory |
+| Method | Compute theo `L` | Ý nghĩa thực tế |
 |---|---|---|
-| Standard Attention | `O(L²)` | `O(L²)` |
-| FlashAttention | `O(L²)` compute | tối ưu memory access |
-| Hyena | `O(N · L log L)` | gần tuyến tính theo `L` |
+| Standard Attention | `O(L²)` | tạo ma trận `L × L` |
+| FlashAttention | `O(L²)` | giảm bộ nhớ, tối ưu IO |
+| Hyena | `O(N · L log L)` | không tạo attention matrix |
 
 <span class="small">Trong Hyena, `N` là order/số bước recurrence, thường được chọn nhỏ.</span>
 
@@ -949,6 +946,7 @@ Khi `L` tăng rất lớn, `L log L` tăng chậm hơn `L²`, nên lợi thế c
 Notes:
 Nhấn mạnh không nói Hyena luôn nhanh hơn. Lợi thế rõ nhất ở context dài.
 FlashAttention vẫn là O(L^2) compute, nhưng tối ưu memory access rất tốt. Vì vậy ở L nhỏ/trung bình có thể vẫn cạnh tranh.
+Paper ghi complexity đầy đủ hơn là O(N · D · L · (log L + D)); trên slide rút gọn theo L để người nghe thấy điểm khác biệt chính với attention.
 Minh họa số: L=1K: L^2≈1M, LlogL≈10K. L=8K: L^2≈67M, LlogL≈106K. L=64K: L^2≈4.1B, LlogL≈1M.
 -->
 
@@ -968,7 +966,7 @@ Minh họa số: L=1K: L^2≈1M, LlogL≈10K. L=8K: L^2≈67M, LlogL≈106K. L=6
   </thead>
   <tbody>
     <tr><td>WikiText-103</td><td>Hyena-3 ~ Transformer 125M</td></tr>
-    <tr><td>The Pile 335M</td><td>Hyena-2 gần Transformer</td></tr>
+    <tr><td>The Pile 335M</td><td>Hyena-2 ~ GPT baseline</td></tr>
     <tr><td>Associative recall</td><td>giữ chất lượng ở 30K–131K, nhiều baseline OOM</td></tr>
   </tbody>
 </table>
@@ -984,7 +982,7 @@ Minh họa số: L=1K: L^2≈1M, LlogL≈10K. L=8K: L^2≈67M, LlogL≈106K. L=6
   <tbody>
     <tr><td>2K</td><td>gần crossover</td></tr>
     <tr><td>8K</td><td>~5x vs attention, ~2x vs FlashAttention</td></tr>
-    <tr><td>64K</td><td>&gt;100x trong paper</td></tr>
+    <tr><td>64K</td><td>~100x vs FlashAttention</td></tr>
   </tbody>
 </table>
 
