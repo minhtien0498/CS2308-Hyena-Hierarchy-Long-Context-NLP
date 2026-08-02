@@ -138,6 +138,10 @@ style: |
   }
   .flow .step.fill { background:var(--navy); color:#fff; border-color:var(--navy); }
   .flow .ar { color:var(--accent); font-size:17px; line-height:1; }
+  /* horizontal variant — dùng khi slide có nhiều khối dọc (tránh tràn) */
+  .flow.row { flex-direction:row; flex-wrap:wrap; justify-content:center; gap:8px; margin:8px 0 4px; }
+  .flow.row .step { padding:7px 15px; font-size:19px; }
+  .flow.row .ar { font-size:14px; }
   /* horizontal pill timeline */
   .chips { display:flex; flex-wrap:wrap; align-items:center; gap:7px; justify-content:center; margin:8px 0 4px; }
   .chip { background:var(--navy); color:#fff; border-radius:999px; padding:6px 15px; font-size:18px; font-weight:600; }
@@ -225,7 +229,7 @@ Trần Tú Quang · Tô Huỳnh Minh Tiến · Nguyễn Cao Trung Kiên
 
 <!--
 Notes:
-Mở đầu cả buổi (Kiên). Dẫn người nghe từ Transformer/Attention tới đúng "vấn đề" mà Hyena giải quyết; bàn giao Tiến cho cơ chế Hyena; Quang cho phần tái hiện thực nghiệm.
+Mở đầu cả buổi (TV1 — Kiên). Dẫn người nghe từ Transformer/Attention tới đúng "vấn đề" mà Hyena giải quyết; bàn giao Tiến (TV2) cho cơ chế Hyena; Quang (TV3) cho phần tái hiện thực nghiệm.
 -->
 
 ---
@@ -347,14 +351,14 @@ Giữ gọn. Khán giả chỉ cần nhớ: PPL thấp = đoán token tốt hơn
 
 ## Nhắc lại kiến trúc Transformer
 
-<div class="flow">
+<div class="flow row">
 <div class="step">Tokens</div>
-<div class="ar">▼</div>
-<div class="step">Token Embedding &nbsp;+&nbsp; Positional Embedding</div>
-<div class="ar">▼</div>
+<div class="ar">▶</div>
+<div class="step">Token + Positional Embedding</div>
+<div class="ar">▶</div>
 <div class="step fill">N × Transformer Block</div>
-<div class="ar">▼</div>
-<div class="step">LayerNorm &nbsp;→&nbsp; LM Head &nbsp;→&nbsp; logits</div>
+<div class="ar">▶</div>
+<div class="step">LayerNorm → LM Head → logits</div>
 </div>
 
 **Một Transformer Block** (Pre-LN + residual):
@@ -367,6 +371,12 @@ $$
 $$
 
 → **Self-Attention** là phép *trộn thông tin* giữa các token — và cũng chính là **nút thắt** ta cần phân tích.
+
+<div class="box">
+
+**FFN** xử lý **từng vị trí độc lập** (chi phí tuyến tính theo $L$) · **MHA** là phần **duy nhất** cho các token "nhìn nhau" — và cũng là nơi phát sinh chi phí $O(L^2)$.
+
+</div>
 
 <!--
 Notes:
@@ -600,7 +610,7 @@ Không đi sâu toán. Khán giả thấy "dòng chảy" tiến hóa và vị tr
 |---|---|---|
 | Trộn thông tin toàn chuỗi | Ma trận `L × L` | **Long convolution** |
 | Trọng số phụ thuộc nội dung | So sánh mọi cặp token | **Data-controlled gating** |
-| Tính toán trên context dài | Chi phí `O(L²)` | **FFTConv `O(L log L)`** |
+| Tính toán trên context dài | `O(L²)` time/memory | **FFTConv `O(L log L)`** |
 
 <span class="small">Điểm quan trọng: Hyena không tối ưu attention cũ, mà đề xuất một operator attention-free mới.</span>
 
@@ -687,11 +697,12 @@ CNN local:   token t chỉ nhận từ vùng gần     [x x x] ---- t
 Long conv:   token t có thể nhận từ rất xa phía trước    [x x x x x x x x x] t
 ```
 
+**Ý nghĩa:** long convolution giúp mô hình hóa phụ thuộc xa mà không cần ma trận attention `L x L`.
+
 <!--
 Notes:
 Giải thích công thức ở mức trực giác: output tại t là tổng có trọng số của các token trước đó.
 Causal conv chỉ nhìn quá khứ, phù hợp language modeling.
-Ý nghĩa: long convolution giúp mô hình hóa phụ thuộc xa mà không cần ma trận attention L x L.
 -->
 
 ---
