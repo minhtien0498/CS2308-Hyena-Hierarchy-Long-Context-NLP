@@ -47,7 +47,7 @@ Attention bị O(L^2)
 | `slides/presentation_prep/slide_content.md` | Nội dung từng slide 12-22: bullet, hình/bảng cần có, ý chính |
 | `slides/presentation_prep/visual_checklist.md` | Danh sách hình/bảng nên chuẩn bị |
 | `slides/presentation_prep/handoff_notes.md` | Câu chuyển và phần cần phối hợp với TV1/TV3 |
-| `slides/presentation_prep/tien_speaker_notes.md` | Bản notes cũ/dạng ngắn để tham khảo |
+| `slides/presentation_prep/tien_speaker_notes.md` | Speaker notes chi tiết cho phần của Tiến |
 | `planning/milestones.md` | Recap, deadline từng milestone, agenda call sync-up |
 | `planning/task_checklist.md` | Checklist toàn bộ việc Tiến cần hoàn thành |
 
